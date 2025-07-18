@@ -2,33 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{sim_many_ts_same_ar1}
 \alias{sim_many_ts_same_ar1}
-\title{#' Simulate a Single AR(1) Time Series
-#'
-#' Generates a single autoregressive time series of order 1 (AR(1)) with
-#' specified length and autoregressive coefficient. The series is initialized
-#' with a standard normal value and evolves as:
-#' \deqn{Y_t = \phi Y_{t-1} + \epsilon_t, \quad \epsilon_t \sim \mathcal{N}(0, 1)}
-#'
-#' @param Tt Integer. Number of time points in the time series.
-#' @param phi Numeric. AR(1) coefficient (typically between -1 and 1 for stationarity).
-#'
-#' @return A numeric vector of length \code{Tt} representing the simulated AR(1) time series.
-#'
-#' @examples
-#' sim_ar1(Tt = 100, phi = 0.8)
-#'
-#' @seealso \code{\link{sim_many_ts_same_ar1}} for simulating multiple AR(1) series.
-#'
-#' @export
-sim_ar1 <- function(Tt, phi) {
-y <- numeric(Tt)
-y\link{1} <- rnorm(1)
-for (t in 2:Tt) {
-y\link{t} <- phi * y\link{t - 1} + rnorm(1)
-}
-return(y)
-}
-Simulate Multiple AR(1) Time Series with Shared Coefficient}
+\title{Simulate Multiple AR(1) Time Series with Shared Coefficient}
 \usage{
 sim_many_ts_same_ar1(Tt, phi, n_series)
 }

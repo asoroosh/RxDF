@@ -75,13 +75,39 @@ check_dim <- function(Y,Tt){
     Y <- matrix(Y, ncol = 1)
   }
 
-  if (!is.null(dim(Y)) && length(dim(aa)) == 2) {
+  if (!is.null(dim(Y)) && length(dim(Y)) == 2) {
     if (!(Tt %in% dim(Y))) stop("Dimensions are wrong!")
     if (ncol(Y) != Tt) Y <- t(Y)
   }
   return(Y)
 }
 
+#' Demean a matrix along rows or columns
+#'
+#' Removes the mean from each row or column of a matrix `Y`.
+#' This is useful for centering time series prior to further processing (e.g., autocorrelation, FFT).
+#' The dimension along which demeaning is performed is controlled by the `dim` argument.
+#'
+#' @param Y Numeric matrix. The data matrix to demean.
+#' Rows or columns represent separate time series depending on the `dim` argument.
+#' @param dim Integer. Direction along which to demean:
+#'   - `dim = 1`: demean columns (subtract mean of each column),
+#'   - `dim = 2`: demean rows (subtract mean of each row, default).
+#'
+#' @return Numeric matrix of the same dimensions as `Y` with means removed along the specified dimension.
+#'
+#' @details
+#' If `dim = 1`, each column is centered so that its mean is zero.
+#' If `dim = 2`, each row is centered so that its mean is zero.
+#' An error is raised if `dim` is not 1 or 2.
+#'
+#' @examples
+#' set.seed(123)
+#' Y <- matrix(rnorm(12), nrow = 3, ncol = 4)
+#' demean_ts(Y, dim = 1)  # Demean columns
+#' demean_ts(Y, dim = 2)  # Demean rows
+#'
+#' @export
 demean_ts <- function(Y, dim = 2)
 if (dim == 1) {
   # Demean columns (each column is a timeseries)
@@ -122,7 +148,7 @@ if (dim == 1) {
 est_rough_ar1 <- function(Y, Tt){
   Y <- check_dim(Y, Tt)
   Y <- demean_ts(Y, dim = 2)
-  arone <- apply(Y, 2, function(g) {
+  arone <- apply(Y, 1, function(g) {
     sum(g[1:(Tt - 1)] * g[2:Tt]) / sum(g^2)
   })
   return(arone)
@@ -547,7 +573,7 @@ tukey_taper_me <- function(acs, Tt, M = sqrt(Tt)) {
 
   M <- round(M)
   w <- (1 + cos((1:M) * pi / M)) / 2
-  tt_ts[,1:M] <- acs[,1:M] * w
+  tt_ts[,1:M] <- sweep(acs[, 1:M, drop = FALSE], 2, w, "*")
 
   return(tt_ts)
 }
