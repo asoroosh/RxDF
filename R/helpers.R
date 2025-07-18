@@ -1,30 +1,30 @@
 
-#' #' Simulate a Single AR(1) Time Series
-#' #'
-#' #' Generates a single autoregressive time series of order 1 (AR(1)) with
-#' #' specified length and autoregressive coefficient. The series is initialized
-#' #' with a standard normal value and evolves as:
-#' #' \deqn{Y_t = \phi Y_{t-1} + \epsilon_t, \quad \epsilon_t \sim \mathcal{N}(0, 1)}
-#' #'
-#' #' @param Tt Integer. Number of time points in the time series.
-#' #' @param phi Numeric. AR(1) coefficient (typically between -1 and 1 for stationarity).
-#' #'
-#' #' @return A numeric vector of length `Tt` representing the simulated AR(1) time series.
-#' #'
-#' #' @examples
-#' #' sim_ar1(Tt = 100, phi = 0.8)
-#' #'
-#' #' @seealso \code{\link{sim_many_ts_same_ar1}} for simulating multiple AR(1) series.
-#' #'
-#' #' @export
-#' sim_ar1 <- function(Tt, phi) {
-#'   y <- numeric(Tt)
-#'   y[1] <- rnorm(1)
-#'   for (t in 2:Tt) {
-#'     y[t] <- phi * y[t - 1] + rnorm(1)
-#'   }
-#'   return(y)
-#' }
+#' Simulate a Single AR(1) Time Series
+#'
+#' Generates a single autoregressive time series of order 1 (AR(1)) with
+#' specified length and autoregressive coefficient. The series is initialized
+#' with a standard normal value and evolves as:
+#' \deqn{Y_t = \phi Y_{t-1} + \epsilon_t, \quad \epsilon_t \sim \mathcal{N}(0, 1)}
+#'
+#' @param Tt Integer. Number of time points in the time series.
+#' @param phi Numeric. AR(1) coefficient (typically between -1 and 1 for stationarity).
+#'
+#' @return A numeric vector of length `Tt` representing the simulated AR(1) time series.
+#'
+#' @examples
+#' sim_ar1(Tt = 100, phi = 0.8)
+#'
+#' @seealso \code{\link{sim_many_ts_same_ar1}} for simulating multiple AR(1) series.
+#'
+#' @export
+sim_ar1 <- function(Tt, phi) {
+  y <- numeric(Tt)
+  y[1] <- rnorm(1)
+  for (t in 2:Tt) {
+    y[t] <- phi * y[t - 1] + rnorm(1)
+  }
+  return(y)
+}
 
 #' Simulate Multiple AR(1) Time Series with Shared Coefficient
 #'
@@ -75,9 +75,9 @@ check_dim <- function(Y,Tt){
     Y <- matrix(Y, ncol = 1)
   }
 
-  if (!is.matrix(Y)) {
+  if (!is.null(dim(Y)) && length(dim(aa)) == 2) {
     if (!(Tt %in% dim(Y))) stop("Dimensions are wrong!")
-    if (nrow(Y) != Tt) Y <- t(Y)
+    if (ncol(Y) != Tt) Y <- t(Y)
   }
   return(Y)
 }
@@ -633,7 +633,6 @@ find_break_point <- function(acs, Tt) {
 
 shrink_me <- function(acs, Tt) {
   acs <- check_dim(acs,Tt)
-  browser()
   where2stop <- find_break_point(acs, Tt)
 
   if (where2stop == 0) {

@@ -37,6 +37,7 @@ acf_fft <- function(Y,
                    pad = TRUE,
                    bias_correction = TRUE) {
 
+
   Y <- check_dim(Y, Tt)
   Y <- demean_ts(Y, dim = 2)
 
