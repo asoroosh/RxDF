@@ -260,14 +260,17 @@ corrautocorr <- function(mu,
 
   # Handle `sigC` as a vector, list of vectors, or matrix
   if (is.atomic(sigC) && !is.list(sigC)) {
+
     # sigC is a vector
     sigC <- make_toeplitz(sigX = sigC, Tt = Tt)
   } else if (is.list(sigC)) {
+
     # sigC is a list of vectors
     if (length(sigC) != length(mu)) {
       stop("When `sigC` is a list, it must have the same length as `mu`.")
     }
     sigC <- lapply(sigC, function(vec) make_toeplitz(sigX = vec, Tt = Tt))
+
   }
 
   # Handle `sigR` as a scalar
@@ -597,8 +600,13 @@ curb_taper_me <- function(acs, Tt, M) {
   acs <- check_dim(acs,Tt)
 
   M <- round(M)
+
+  if (Tt == M){
+    stop('The curbing window is full length of timeseries. Tt = M.')
+  }
+
   ct_ts <- acs
-  ct_ts[(M + 1):Tt] <- 0
+  ct_ts[,(M + 1):Tt] <- 0
 
   return(ct_ts)
 }
@@ -657,6 +665,25 @@ find_break_point <- function(acs, Tt) {
 }
 
 
+#' Shrink autocorrelation sequence beyond significance threshold
+#'
+#' Applies an adaptive truncation ("shrinkage") procedure to an autocorrelation sequence.
+#' It identifies the first lag where autocorrelations fall below a 95% confidence bound
+#' and sets all subsequent lags to zero.
+#'
+#' @param acs Numeric vector or matrix representing a single autocorrelation sequence.
+#' Length must equal `Tt`. If input is a matrix, it must be 1 row or column.
+#' @param Tt Integer. Number of lags (length of `acs`).
+#'
+#' @return Numeric vector of length `Tt` containing the shrunk autocorrelation sequence.
+#'
+#' @details
+#' - If all autocorrelations are below the confidence bound from the beginning, returns all zeros.
+#' - Uses `find_break_point()` internally to determine truncation point.
+#' - Calls `curb_taper_me()` internally for hard truncation at the break point.
+#'
+#' @seealso \code{\link{find_break_point}}, \code{\link{curb_taper_me}}
+#'
 shrink_me <- function(acs, Tt) {
   acs <- check_dim(acs,Tt)
   where2stop <- find_break_point(acs, Tt)

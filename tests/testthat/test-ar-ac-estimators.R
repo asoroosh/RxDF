@@ -136,3 +136,113 @@ test_that("tukey_taper_me works when M = 1 (only first column nonzero)", {
   expect_true(all(result[, 2:6] == 0))
 })
 
+######################################
+# test-curb_taper_me
+######################################
+
+test_that("curb_taper_me preserves values for M = Tt", {
+  acs <- matrix(rnorm(2 * 8), nrow = 2, ncol = 8)
+  expect_error(curb_taper_me(acs, Tt = 8, M = 8), "The curbing window is full length of timeseries. Tt = M.")
+})
+
+test_that("curb_taper_me zeroes all except first column for M = 1", {
+  acs <- matrix(rnorm(4 * 5), nrow = 4, ncol = 5)
+  result <- curb_taper_me(acs, Tt = 5, M = 1)
+
+  expect_true(all(result[, 2:5] == 0))
+  expect_equal(result[, 1], acs[, 1])
+})
+
+test_that("curb_taper_me works for single-row input", {
+  acs <- matrix(1:10, nrow = 1)
+  result <- curb_taper_me(acs, Tt = 10, M = 5)
+
+  expect_equal(dim(result), c(1, 10))
+  expect_equal(result[1, 1:5], 1:5)
+  expect_true(all(result[1, 6:10] == 0))
+})
+
+
+######################################
+# test-shrink_me.R
+######################################
+
+test_that("shrink_me returns all zeros when all values below confidence bound", {
+  Tt <- 5
+  acs <- rep(0.001, Tt)  # very small values ⇒ below confidence bound
+  result <- shrink_me(acs, Tt)
+
+  expect_equal(result, rep(0, Tt))
+})
+
+test_that("shrink_me truncates correctly at known break point", {
+  Tt <- 6
+  acs <- c(0.9, 0.85, 0.01, 0.01, 0.01, 0.01)  # falls below after lag 2
+  result <- shrink_me(acs, Tt)
+
+  expect_true(all(result[1:2] != 0))
+  expect_true(all(result[3:6] == 0))
+})
+
+test_that("shrink_me preserves length and type", {
+  Tt <- 8
+  acs <- c(0.6, 0.3, 0.2, 0.1, 0.05, 0.01, 0.01, 0.01)
+  result <- shrink_me(acs, Tt)
+
+  expect_length(result, Tt)
+  expect_type(result, "double")
+})
+
+
+######################################
+# find_break_point.R
+######################################
+
+test_that("find_break_point returns 0 when all values below threshold", {
+  Tt <- 10
+  bnd <- qnorm(0.975) / sqrt(Tt)
+  acs <- rep(bnd / 2, Tt)  # All well below threshold
+
+  result <- find_break_point(acs, Tt)
+  expect_equal(result, 0)
+})
+
+test_that("find_break_point returns Tt when all values above threshold", {
+  Tt <- 10
+  bnd <- qnorm(0.975) / sqrt(Tt)
+  acs <- rep(bnd * 2, Tt)  # All well above threshold
+
+  result <- find_break_point(acs, Tt)
+  expect_equal(result, Tt)
+})
+
+test_that("find_break_point returns correct index when crossing occurs", {
+  Tt <- 10
+  bnd <- qnorm(0.975) / sqrt(Tt)
+  acs <- c(rep(bnd * 2, 5), rep(bnd / 2, 5))  # First 5 above, then below
+
+  result <- find_break_point(acs, Tt)
+  expect_equal(result, 5)
+})
+
+test_that("find_break_point returns correct index when crossing at lag 3", {
+  Tt <- 6
+  bnd <- qnorm(0.975) / sqrt(Tt)
+  acs <- c(bnd * 2, bnd * 2, bnd / 2, bnd / 2, bnd / 2, bnd / 2)
+
+  result <- find_break_point(acs, Tt)
+  expect_equal(result, 2)
+})
+
+test_that("find_break_point works for random acf with known structure", {
+  set.seed(123)
+  x <- rnorm(100)
+  ac <- acf(x, plot = FALSE, lag.max = 20)$acf[-1]  # Exclude lag 0
+
+  result <- find_break_point(ac, Tt = 20)
+
+  expect_true(is.numeric(result))
+  expect_true(result >= 0 && result <= 20)
+})
+
+
