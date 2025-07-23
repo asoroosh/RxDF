@@ -47,7 +47,7 @@ sim_ar1 <- function(Tt, phi) {
 #'
 #' @export
 sim_many_ts_same_ar1 <- function(Tt, phi, n_series) {
-  return(replicate(n_series, sim_ar1(Tt, phi)))
+  return(t(replicate(n_series, sim_ar1(Tt, phi))))
 }
 
 #' Ensure Correct Dimensionality of Time Series Data. It ensures matrics are
@@ -181,6 +181,7 @@ est_rough_ar1 <- function(Y, Tt){
 #'
 #' @export
 fisher_pval_matrix <- function(netmat, R2Zcrt) {
+  # NB! for rho = 1, atanh will be Inf
   Z <- atanh(netmat) * R2Zcrt
   P <- 2 * pnorm(-abs(Z))
   return(list(Z = Z, P = P))
@@ -258,28 +259,29 @@ corrautocorr <- function(mu,
                          Tt,
                          verboseflag = TRUE) {
 
-  # Handle `sigC` as a vector, list of vectors, or matrix
   if (is.atomic(sigC) && !is.list(sigC)) {
-
     # sigC is a vector
     sigC <- make_toeplitz(sigX = sigC, Tt = Tt)
   } else if (is.list(sigC)) {
-
     # sigC is a list of vectors
     if (length(sigC) != length(mu)) {
       stop("When `sigC` is a list, it must have the same length as `mu`.")
     }
-    sigC <- lapply(sigC, function(vec) make_toeplitz(sigX = vec, Tt = Tt))
-
+    sigC <- lapply(sigC,
+                   function(vec) make_toeplitz(sigX = vec, Tt = Tt))
   }
 
   # Handle `sigR` as a scalar
-  if (is_scalar(sigR)) {
-    if (length(mu) != 2) {
-      stop("sigR must be a square matrix when more than 2 time series are required.")
-    }
-    sigR <- matrix(sigR, nrow = 2, ncol = 2)
-    diag(sigR) <- 1
+  if ((!is_scalar(sigR) && length(mu) > 1) && !is.matrix(sigR)){
+    stop("You can either input input a single scalar or a matrix")
+  } else if (is_scalar(sigR)){
+    sigR <- matrix(c(1, sigR,
+                     sigR, 1),
+                   nrow = 2, ncol = 2)
+  }
+
+  if (is.matrix(sigR) && !all(diag(sigR) == 1)){
+    stop("sigR diagnoal must be one given it is correlation matrix.")
   }
 
   # Ensure `sigR` is PSD

@@ -2,6 +2,74 @@
 library(testthat)
 
 ######################################
+# test-RxDF.R
+######################################
+
+test_that("RxDF works correctly on white noise", {
+  set.seed(1)
+  Y <- matrix(rnorm(100 * 5), nrow = 5)  # 5 i.i.d. time series of length 100
+  result <- RxDF(Y, Tt = 100, truncate = NULL, verbose = FALSE)
+
+  expect_type(result, "list")
+  expect_true("var_hat_rho" %in% names(result))
+  expect_true("stat" %in% names(result))
+  expect_equal(dim(result$var_hat_rho), c(5, 5))
+
+  # Variance should be close to (1 - rho^2)^2 / Tt = 1/100 when rho ~ 0
+  upper_tri_variances = result$var_hat_rho[which(upper.tri(matrix(1, 5, 5)))]
+  expect_true(all(abs(upper_tri_variances - 1/100) < 0.01))
+})
+
+test_that("RxDF handles perfect correlation correctly", {
+  Y <- matrix(rnorm(100), nrow = 2, ncol = 100, byrow = TRUE)
+  Y[2, ] <- Y[1, ]  # perfect correlation
+  result <- RxDF(Y, Tt = 100, verbose = FALSE)
+  expect_equal(result$stat$rho[1, 2], 1)
+  expect_equal(result$var_hat_rho[1, 2], 0)
+  expect_equal(result$stat$p[1, 2], NaN)
+})
+
+test_that("RxDF supports fixed truncation correctly", {
+  set.seed(123)
+  Y <- corrautocorr(mu = c(0, 0), sigR = 0.5,
+                    sigC = list(c(0.6, 0.3, 0.2), c(0.5, 0.25, 0.1)),
+                    Tt = 100)
+
+  result <- RxDF(Y, Tt = 100, truncate = 5, verbose = FALSE)
+  expect_true("var_hat_rho" %in% names(result))
+  expect_true(is.matrix(result$var_hat_rho))
+})
+
+test_that("RxDF adaptive truncation returns W2S", {
+  set.seed(123)
+
+  Y <- corrautocorr(mu = c(0,0,0),
+                    sigR = diag(3),
+                    sigC = list(c(0.6, 0.3, 0.2), c(0.5, 0.25, 0.1), c(0.6, 0.3, 0.2)),
+                    Tt = 100)
+
+  result <- RxDF(Y, Tt = 100, truncate = "adaptive", verbose = FALSE)
+  expect_true("W2S" %in% names(result$stat))
+  expect_equal(dim(result$stat$W2S), c(3, 3))
+})
+
+test_that("RxDF enforces textbook variance when TVflag is TRUE", {
+  set.seed(456)
+  Y <- corrautocorr(mu = c(0,0,0),
+                    sigR = diag(3),
+                    sigC = list(c(0.6, 0.3, 0.2), c(0.5, 0.25, 0.1), c(0.6, 0.3, 0.2)),
+                    Tt = 100)
+
+  result <- RxDF(Y, Tt = 100,
+                 TVflag = TRUE,
+                 verbose = FALSE)
+
+  idx = which(upper.tri(matrix(1, 3, 3)))
+  expect_true(all(result$var_hat_rho[idx] >= result$stat$TV[idx]))
+})
+
+
+######################################
 # test-xacf_fft.R
 ######################################
 

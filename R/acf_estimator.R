@@ -251,20 +251,20 @@ xacf_fft <- function(Y, Tt,
 #' print(result$V)
 #'
 #' @export
-AR1MC <- function(Y, Tt, n_sim = 1000) {
+AR1MC <- function(Y, Tt, n_sim = 50) {
 
   Y <- check_dim(Y, Tt)
   Y <- demean_ts(Y, dim = 2)
 
   arone <- est_rough_ar1(Y, Tt)
   arone0 <- median(arone)
-  netmat <- cor(Y)
+  netmat <- cor(t(Y))
 
   # Create null data using the estimated AR(1) coefficient
   Yr <- sim_many_ts_same_ar1(Tt, arone0, n_sim)
 
   # Compute null correlations
-  Yr_corr <- cor(Yr)
+  Yr_corr <- cor(t(Yr))
 
   # Extract upper triangular elements (excluding diagonal)
   IDX <- which(upper.tri(matrix(1, n_sim, n_sim)))
@@ -281,5 +281,6 @@ AR1MC <- function(Y, Tt, n_sim = 1000) {
               Z = f2p$Z,
               P = f2p$P,
               R2Zcrt = R2Zcrt,
-              arone = arone))
+              arone = arone,
+              median_arone = arone0))
 }

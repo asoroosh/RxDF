@@ -54,7 +54,7 @@ RxDF <- function(Y,
   nn <- nrow(Y)
 
   # Standardize each row
-  Y <- Y / apply(Y, 1, sd)
+  Y <- Y/apply(Y, 1, sd)
 
   # Correlation matrix
   rho <- cor(t(Y))
@@ -116,7 +116,7 @@ RxDF <- function(Y,
   SumMat_ac <- SumMat(ac, nLg)
   ProdMat_ac <- ProdMat(ac, nLg)
 
-  VarHatRho <- (
+  var_hat_rho <- (
     Tp * (1 - rho^2)^2 +
       rho^2 * apply(wgtm3 * (SumMat_ac2 + xc_p^2 + xc_n^2), c(1, 2), sum) -
       2 * rho * apply(wgtm3 * (SumMat_ac * (xc_p + xc_n)), c(1, 2), sum) +
@@ -124,11 +124,11 @@ RxDF <- function(Y,
   ) / Tt^2
 
   TV <- (1 - rho^2)^2 / Tt
-  Stat <- list(EVE = matrix(0, 0, 2))  # initialize empty matrix
+  Stat <- list(EVE = matrix(0, 0, 2))  # initialize empty matrix, to save memory allocations
 
-  if (any(VarHatRho < TV) && TVflag) {
-    idx_ex <- which(VarHatRho < TV, arr.ind = TRUE)
-    VarHatRho[idx_ex] <- TV[idx_ex]
+  if (any(var_hat_rho < TV) && TVflag) {
+    idx_ex <- which(var_hat_rho < TV, arr.ind = TRUE)
+    var_hat_rho[idx_ex] <- TV[idx_ex]
     if (verbose) {
       message(paste0(nrow(idx_ex) - nn, " edges had variance smaller than textbook variance!"))
     }
@@ -136,10 +136,10 @@ RxDF <- function(Y,
   }
   Stat$TV <- TV
 
-  diag(VarHatRho) <- 0  # diagonal is "rubbish"
+  diag(var_hat_rho) <- 0  # diagonal is "rubbish"
 
-  rf <- atanh(rho)
-  sf <- VarHatRho / (1 - rho^2)^2  # delta method
+  rf <- .xdf_atanh(rho)
+  sf <- var_hat_rho / (1 - rho^2)^2  # delta method
   rzf <- rf / sqrt(sf)
   diag(rzf) <- 0
 
@@ -149,6 +149,32 @@ RxDF <- function(Y,
   Stat$z <- rzf
   Stat$p <- f_pval
   Stat$W2S <- W2S
+  Stat$rho <- rho
 
-  return(list(VarHatRho = VarHatRho, Stat = Stat))
+  return(list(stat = Stat,
+              var_hat_rho = var_hat_rho))
+}
+
+.xdf_atanh <- function(rho) {
+  if (is.matrix(rho)) {
+    result <- apply(rho, c(1, 2), .safe_atanh)
+    dimnames(result) <- dimnames(rho)
+    diag(rho) <- 0 # Just to make sure we are going to follow the original behaviour
+    return(result)
+  } else if (is.vector(rho)) {
+    return(sapply(rho, .safe_atanh))
+  } else {
+    return(.safe_atanh(rho))
+  }
+}
+
+.safe_atanh <- function(x) {
+  max_val <- .Machine$double.xmax
+  if (x >= 1) {
+    return(max_val)
+  } else if (x <= -1) {
+    return(-max_val)
+  } else {
+    return(atanh(x))
+  }
 }
