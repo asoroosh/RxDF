@@ -4,7 +4,7 @@
 \alias{acf_fft}
 \title{Fast Autocovariance and Autocorrelation Calculation Using FFT}
 \usage{
-acf_fft(Y, Tt, lg = NULL, pad = TRUE, bias_correction = TRUE)
+acf_fft(Y, Tt, lag = NULL, pad = TRUE, bias_correction = TRUE)
 }
 \arguments{
 \item{Y}{Numeric matrix. A matrix of size IxT where I is the number of time series (rows) and T is their length (columns).
@@ -12,11 +12,11 @@ Each row is treated as an individual time series.}
 
 \item{Tt}{Integer. The number of datapoints in the timeseries. Is always used for sanity checking.}
 
-\item{lg}{Optional integer vector of lags to return (not used in current implementation).}
-
 \item{pad}{Logical. If TRUE (default), zero-pads time series to next power of two for improved FFT performance.}
 
 \item{bias_correction}{Logical. If TRUE (default), applies unbiased lag-dependent normalization (scales by N / (N - k) at lag k) to match R's \code{acf(..., type = "correlation")}.}
+
+\item{lg}{Optional integer vector of lags to return (not used in current implementation).}
 }
 \value{
 A list with:
