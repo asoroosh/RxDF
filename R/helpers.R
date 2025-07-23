@@ -408,8 +408,7 @@ is_scalar <- function(x) {
 #' @examples
 #' # Example 1: Create a 5x5 Toeplitz matrix with specified off-diagonal values
 #' sigX <- c(0.6, 0.3, 0.2)
-#' ndp <- 5
-#' make_toeplitz(sigX, Tt)
+#' make_toeplitz(sigX, 5)
 #'
 #' # Example 2: Create a larger Toeplitz matrix (10x10) with the same off-diagonal values
 #' make_toeplitz(sigX, 10)
