@@ -14,16 +14,6 @@
 ## Table of contents
 * [Introduction](#introduction)
 * [Intall](#Install)
-* [Examples](#Examples)
-  * [Using xDF](#xxDF)
-  * [Constructing Functional Connectivity (FC) Maps](#FC)
-    * [FDR-based Statistically Thresholded Functional Connectivity](#STFC)
-    * [CE-based proportionally Thresholded Functional Connectivity](#CEFC)
-    * [Unthresholded Functional Connectivity](#UFC)
-* [Simulating time series of arbitrary correlation and autocorrelation structure](#Sim)
-  * [Correlated but White Time Series](#CW)
-  * [Uncorrelated but Autocorrelated Time Series](#UA)
-  * [Correlated and Autocorrelated Time Series](#CA)
 
 
 ## Introduction <a name="introduction"></a>
@@ -36,14 +26,12 @@ Collection of scripts to implement the xDF method introduced in
 The `RxDF()` can be used to:
 * Estimate the variance of Pearson's correlation coefficients
 * Calculate the z-statistics maps of large scale correlation maps (e.g., functional connectivity)
-* Estimate acuurate p-values for such correlation coefficients
+* Estimate accurate p-values for such correlation coefficients
 
 
 ## Installation <a name="Install"></a>
-For now, the xDF has only been implemented in MATLAB. Although we will be releasing the Python version in a near future. You need MATLAB statistical toolbox to run the script.
-
-To clone the repository use:
+To install RxDF you can clone and install the package using `devtools`;
 
 ```{r}
-devtools::install_github(https://github.com/asoroosh/xDF.git)
+devtools::install_github(https://github.com/asoroosh/RxDF.git)
 ```
