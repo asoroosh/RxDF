@@ -33,5 +33,5 @@ The `RxDF()` can be used to:
 To install RxDF you can clone and install the package using `devtools`;
 
 ```{r}
-devtools::install_github(https://github.com/asoroosh/RxDF.git)
+devtools::install_github('https://github.com/asoroosh/RxDF.git')
 ```
