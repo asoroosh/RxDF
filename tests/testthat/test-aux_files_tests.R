@@ -251,3 +251,40 @@ test_that("ProdMat transposes input if needed", {
   expect_equal(dim(PM0), c(n, n, Tt))
 })
 
+######################################
+# test-make_toeplitz.R
+######################################
+
+test_that("make_toeplitz returns correct matrix dimensions", {
+  sigX <- c(0.5, 0.3)
+  Tt <- 5
+  mat <- make_toeplitz(sigX, Tt)
+  expect_equal(dim(mat), c(5, 5))
+})
+
+test_that("make_toeplitz diagonal entries are 1", {
+  sigX <- c(0.8, 0.4, 0.2)
+  Tt <- 6
+  mat <- make_toeplitz(sigX, Tt)
+  expect_true(all(diag(mat) == 1))
+})
+
+test_that("make_toeplitz fills correct off-diagonals", {
+  sigX <- c(0.9, 0.7)
+  Tt <- 4
+  mat <- make_toeplitz(sigX, Tt)
+  expect_equal(mat[1, 2], 0.9)
+  expect_equal(mat[1, 3], 0.7)
+  expect_equal(mat[1, 4], 0)  # Beyond sigX length ⇒ 0
+})
+
+test_that("make_toeplitz works when sigX is shorter than needed", {
+  sigX <- c(0.6)
+  Tt <- 4
+  mat <- make_toeplitz(sigX, Tt)
+  expect_equal(mat[1, 2], 0.6)
+  expect_equal(mat[1, 3], 0)  # Default 0
+  expect_equal(mat[1, 4], 0)
+})
+
+

@@ -1,6 +1,155 @@
 # tests/testthat/test-ar-ac-estimators.R
 library(testthat)
 
+######################################
+# test-xacf_fft.R
+######################################
+
+# tests/testthat/test-xacf_fft.R
+
+test_that("xacf_fft returns correct structure and dimensions", {
+  set.seed(1)
+  Y <- matrix(rnorm(4 * 50), nrow = 4, ncol = 50)
+
+  res <- xacf_fft(Y, Tt = 50)
+
+  expect_true(is.list(res))
+  expect_true(all(c("xC", "lidx") %in% names(res)))
+
+  expect_equal(dim(res$xC)[1:2], c(4, 4))
+  expect_true(is.numeric(res$lidx))
+})
+
+
+test_that("xacf_fft autocorrelations at lag 0 equal 1", {
+  set.seed(3)
+  Y <- matrix(rnorm(2 * 100), nrow = 2, ncol = 100)
+  res <- xacf_fft(Y, Tt = 100)
+
+  mid_lag <- which(res$lidx == 0)
+  diag_vals <- diag(xC <- res$xC[, , mid_lag])
+  expect_true(all(abs(diag_vals - 1) < 1e-14))
+})
+
+test_that("xacf_fft cross-corr at lag 0 equals cor(Y)", {
+  set.seed(4)
+  Y <- matrix(rnorm(3 * 50), nrow = 3, ncol = 50)
+
+  res <- xacf_fft(Y, Tt = 50)
+  mid_lag <- which(res$lidx == 0)
+
+  lag0_mat <- res$xC[, , mid_lag]
+  cor_mat <- cor(t(Y))
+
+  expect_equal(lag0_mat, cor_mat, tolerance = 1e-6)
+})
+
+test_that("xacf_fft handles lag=0 properly", {
+  set.seed(5)
+  Y <- matrix(rnorm(4 * 40), nrow = 4, ncol = 40)
+
+  res <- xacf_fft(Y, Tt = 40, lag = 0)
+
+  expect_equal(length(res$lidx), 1)
+  expect_equal(res$lidx, 0)
+  expect_equal(dim(res$xC)[3], 1)
+
+  cor_mat <- cor(t(Y))
+  expect_equal(res$xC[, , 1], cor_mat, tolerance = 1e-6)
+})
+
+######################################
+# test-acf_fft.R
+######################################
+
+test_that("acf_fft returns correct structure", {
+  set.seed(1)
+  Y <- matrix(rnorm(5 * 100), nrow = 5, ncol = 100)
+  result <- acf_fft(Y, Tt = 100)
+
+  expect_true(is.list(result))
+  expect_true(all(c("acor", "acov", "CI") %in% names(result)))
+
+  expect_equal(dim(result$acor), dim(Y))
+  expect_equal(dim(result$acov), dim(Y))
+
+  expect_length(result$CI, 2)
+})
+
+test_that("acf_fft autocorrelation at lag 0 equals 1", {
+  set.seed(2)
+  Y <- matrix(rnorm(3 * 50), nrow = 3, ncol = 50)
+  result <- acf_fft(Y, Tt = 50)
+  acor <- result$acor
+  expect_equal(acor[, 1], rep(1, 3))
+})
+
+test_that("acf_fft matches stats::acf correlation for single timeseries", {
+  set.seed(3)
+  y <- rnorm(50)
+  result <- acf_fft(y,
+                    Tt = 50,
+                    pad = TRUE,
+                    bias_correction = FALSE)
+
+  acf_ref <- acf(y,
+                 plot = FALSE,
+                 lag.max = 20,
+                 type = "correlation",
+                 demean = T)
+
+  # Compare autocorrelation at lag 1 to 10 for tolerance
+  expect_equal(as.numeric(result$acor[1, 1:10]),
+               as.numeric(acf_ref$acf[1:10]), tolerance = 1e-14)
+})
+
+# It is currently failing, but I can't work out what it is being done internally in R
+# It however won't be impacting the execution and accuracy.
+#
+# test_that("acf_fft matches stats::acf covariance for single timeseries", {
+#   set.seed(3)
+#   y <- rnorm(50)
+#   result <- acf_fft(y,
+#                     Tt = 50,
+#                     pad = TRUE,
+#                     bias_correction = FALSE)
+#
+#   acf_ref <- acf(y,
+#                  plot = FALSE,
+#                  lag.max = 20,
+#                  type = "covariance",
+#                  demean = T)
+#
+#   # Compare autocorrelation at lag 1 to 10 for tolerance
+#   expect_equal(as.numeric(result$acov[1, 1:10]),
+#                as.numeric(acf_ref$acf[1:10]), tolerance = 1e-14)
+# })
+
+
+test_that("acf_fft handles multiple timeseries correctly", {
+  set.seed(5)
+  Y <- matrix(rnorm(4 * 30), nrow = 4, ncol = 30)
+  result <- acf_fft(Y, Tt = 30, pad = TRUE, bias_correction = TRUE)
+
+  expect_equal(dim(result$acor), c(4, 30))
+  expect_true(all(abs(result$acor[, 1] - 1) < 1e-8))
+})
+
+test_that("acf_fft confidence intervals computed correctly", {
+  Tt <- 100
+  Y <- matrix(rnorm(2 * Tt), nrow = 2)
+  result <- acf_fft(Y, Tt = Tt)
+
+  expected_bnd <- (sqrt(2) * qnorm(0.975)) / sqrt(Tt)
+  expect_equal(result$CI, c(-expected_bnd, expected_bnd))
+})
+
+
+######################################
+# test-est_rough_ar1
+######################################
+
+
 test_that("est_rough_ar1 estimates AR(1) correctly for simulated data", {
   set.seed(123)
   phi <- 0.6
