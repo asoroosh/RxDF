@@ -5,56 +5,52 @@
 ## Highlights
 * Autocorrelation biases the standard error of Pearson's correlation and breaks the variance-stabilising property of Fisher's transformation.
 * Commonly used methods (see `mis` directory) to adjust correlation standard errors are themselves biased when true correlation is non-zero due to a confounding effect.
-* We propose a “xDF” method to provide accurate estimates of the variance of Pearson’s correlation -- before or after Fisher’s transformation -- that considers auto-correlation of each time series as well as instantaneous and lagged cross-correlation.
-* Accounting for the autocorrelation in resting-state functional connectivity considerably alters the graph theoretical description of human connectome.
-* Severity of resting state fMRI autocorrelation varies systematically with region of interest size, and is heterogeneous over subjects.
-
-
+* We propose a “xDF” method to provide accurate estimates of the variance of Pearson’s correlation — before or after Fisher’s transformation — that considers auto-correlation of each time series as well as instantaneous and lagged cross-correlation.
+* Accounting for the autocorrelation in resting-state functional connectivity considerably alters the graph theoretical description of the human connectome.
+* Severity of resting-state fMRI autocorrelation varies systematically with region of interest size, and is heterogeneous over subjects.
 
 ## Table of contents
 * [Introduction](#introduction)
-* [Intallation](#Install)
-* [Simulation Examples](#Example for Pearson's Correlation)
-* [Real-world Examples](#Example for Pearson's Correlation)
-* [Real-world Examples](#acf)
-
+* [Installation](#installation)
+* [Simulation Examples](#simulation-examples)
+* [Real-world Examples](#real-world-examples)
+* [Autocorrelation Estimation](#acf)
 
 ## Introduction <a name="introduction"></a>
-Collection of scripts to implement the xDF method introduced in
+This repository implements the xDF method introduced in:
 
 *Afyouni, Soroosh, Stephen M. Smith, and Thomas E. Nichols. "Effective Degrees of Freedom of the Pearson's Correlation Coefficient under Serial Correlation." bioRxiv (2018): 453795.*
 
 *Afyouni, Soroosh, Stephen M. Smith, and Thomas E. Nichols. "Effective degrees of freedom of the Pearson's correlation coefficient under autocorrelation." NeuroImage 199 (2019): 609-625.*
 
-The `RxDF()` can be used to:
+The `RxDF()` function can be used to:
 * Estimate the variance of Pearson's correlation coefficients
-* Calculate the z-statistics maps of large scale correlation maps (e.g., functional connectivity)
-* Estimate accurate p-values for such correlation coefficients
+* Calculate z-statistics maps for large-scale correlation matrices (e.g., functional connectivity)
+* Estimate accurate p-values for correlation coefficients, accounting for autocorrelation
 
+## Installation <a name="installation"></a>
+To install RxDF you can clone and install the package using `devtools`:
 
-## Installation <a name="Install"></a>
-To install RxDF you can clone and install the package using `devtools`;
-
-```{r}
+```r
 devtools::install_github('https://github.com/asoroosh/RxDF.git')
 ```
 
-## Simulation Example for Pearson's Correlation <a name="Examples"></a>
-
-Using simulated data, we demonstrate various scenarios of how to leverage xDF. To simulate correlated and/or autocorrelated data, you can leverage `RxDF::corrautocorr()` function. 
+## Simulation Examples <a name="simulation-examples"></a>
+The following examples demonstrate how to use `RxDF()` with simulated data.
 
 ### Uncorrelated, White Time Series
 
-Generate five time series that are uncorrelated and there is no autocorrelation in each timeseries. 
+Generate five time series of length 1000, with no correlation or autocorrelation:
+
 
 ```
 Y <- matrix(rnorm(1000 * 5), nrow = 5)
 xDF_out <- RxDF::RxDF(Y, Tt = 1000)
 ```
 
-You can explore the estimated z-scores by printing `xDF_out$stat$z`,
+Z-scores and p-values of pairwise correlations:
 
-```
+```r
 xDF_out$stat$z
            [,1]         [,2]       [,3]       [,4]         [,5]
 [1,]  0.0000000 -0.596202179 -1.5305090 -0.1491905  0.124873392
@@ -65,9 +61,7 @@ xDF_out$stat$z
 
 ```
 
-and p-values by printing `xDF_out$stat$p`,
-
-```
+```r
 > xDF_out$stat$p
           [,1]      [,2]      [,3]      [,4]      [,5]
 [1,] 0.0000000 0.5510402 0.1258908 0.8814033 0.9006238
@@ -77,7 +71,7 @@ and p-values by printing `xDF_out$stat$p`,
 [5,] 0.9006238 0.9982511 0.8613718 0.7843361 0.0000000
 ```
 
-Note that the diagonal for both p-values and z-scores are set to zero. 
+The estimated and theoretical variances should match exactly due to independence. Note that the diagonal for both p-values and z-scores are set to zero. 
 
 
 xDF also generates the theoritical variance and estimated variance for each pairwise correlation. For theortical variance, you can print out `xDF_out$stat$TV`, 
@@ -117,6 +111,9 @@ Y <- RxDF::corrautocorr(mu = c(0, 0),
                   Tt = 1000)
 ```
 
+Check actual correlation and autocorrelation structure:
+
+
 ```
 cor(t(Y))
           [,1]      [,2]
@@ -134,10 +131,16 @@ acf$acor[2,1:10]
  [1]  1.00000000 -0.01475334 -0.00053736  0.00884265
 ```
 
-```
+Run xDF:
+
+```r
 xDF_out = RxDF::RxDF(Y,1000)
 -- Adaptive truncation.
+```
 
+Review z-scores and p-values:
+
+```r
 xDF_out$stat$z
          [,1]     [,2]
 [1,]  0.00000 18.28706
@@ -240,15 +243,61 @@ xDF_out$stat$p
 
 ## Real-data Example for Pearson's Correlation <a name="Examples"></a>
 
+To be populated.
+
 ## Rapid estimate of autocorrelation function using xDF <a name="acf"></a>
 
 xDF offers two key functions for estimation auto- and cross-correlations of time series. The function leverage Wiener–Khinchin theorem to estimate the acf functions. 
 
 ```
-Y <- RxDF::corrautocorr(mu = c(0, 0), 
-                  sigR = 0.5,
-                  sigC = list(c(0.6, 0.3, 0.2), c(0.5, 0.25, 0.1)),
-                  Tt = 1000)
+library(microbenchmark)
+set.seed(1)
+M <- 1000
+N <- 256
+Ym <- matrix(rnorm(M * N), nrow = M, ncol = N)
+```
+
+```
+bench_single_timeseries <- microbenchmark(
+  acf_fft = RxDF::acf_fft(Ym[,1], M),
+  acf_native_single = acf(Ym[,1], 
+                            plot = FALSE, 
+                            demean = TRUE, 
+                            lag.max = M - 1),
+  times = 100
+)
+print(bench_single_timeseries)
+
+
+Unit: microseconds
+              expr     min       lq     mean   median       uq      max neval
+           acf_fft 127.428 134.6440 151.9977 139.9945 150.4905  648.866   100
+ acf_native_single 494.255 510.1425 539.7215 519.7365 527.1575 1975.011   100
+```
+
+
+```
+acf_native_multiple <- function(Ym, M) {
+  apply(Ym, 1, function(x) {
+    acf(x, 
+        plot = FALSE, 
+        demean = TRUE, 
+        lag.max = M - 1)
+  })
+}
+
+bench_multiple_timeseries <- microbenchmark(
+  acf_fft = RxDF::acf_fft(Ym, M),
+  acf_native_multiple = acf_native_multiple(Ym, M),
+  times = 100
+)
+print(bench_multiple_timeseries)
+
+Unit: milliseconds
+                expr      min       lq     mean   median       uq       max neval
+             acf_fft 18.90551 23.45508 38.96694 27.04024 34.36702  99.91183   100
+ acf_native_multiple 77.90312 82.08774 85.80311 83.94570 85.98588 148.86739   100
+
 ```
 
 
