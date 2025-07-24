@@ -43,14 +43,14 @@ The following examples demonstrate how to use `RxDF()` with simulated data.
 Generate five time series of length 1000, with no correlation or autocorrelation:
 
 
-```
+```r
 Y <- matrix(rnorm(1000 * 5), nrow = 5)
 xDF_out <- RxDF::RxDF(Y, Tt = 1000)
 ```
 
 Z-scores and p-values of pairwise correlations:
 
-```r
+```
 xDF_out$stat$z
            [,1]         [,2]       [,3]       [,4]         [,5]
 [1,]  0.0000000 -0.596202179 -1.5305090 -0.1491905  0.124873392
@@ -61,7 +61,7 @@ xDF_out$stat$z
 
 ```
 
-```r
+```
 > xDF_out$stat$p
           [,1]      [,2]      [,3]      [,4]      [,5]
 [1,] 0.0000000 0.5510402 0.1258908 0.8814033 0.9006238
@@ -103,7 +103,7 @@ Note that in this case the theoritical variance and the variance estimated by xD
 
 Generate time series that are correlated with each other, but each time series is a white noice (i.e., each time series is not correlated with lagged version of itself)
 
-```
+```r
 set.seed(1)
 Y <- RxDF::corrautocorr(mu = c(0, 0), 
                   sigR = 0.5,
@@ -121,13 +121,17 @@ cor(t(Y))
 [2,] 0.5214198 1.0000000
 ```
 
-```
+```r
 acf = RxDF::acf_fft(Y, 1000)
+```
 
-acf$acor[1,1:10]
+Check the autocorrelation, for both timeseries, for the first four lags:
+
+```
+acf$acor[1,1:4]
  [1]  1.00000000 -0.01555711  0.01374823 -0.02649370
 
-acf$acor[2,1:10]
+acf$acor[2,1:4]
  [1]  1.00000000 -0.01475334 -0.00053736  0.00884265
 ```
 
@@ -135,12 +139,11 @@ Run xDF:
 
 ```r
 xDF_out = RxDF::RxDF(Y,1000)
--- Adaptive truncation.
 ```
 
 Review z-scores and p-values:
 
-```r
+```
 xDF_out$stat$z
          [,1]     [,2]
 [1,]  0.00000 18.28706
@@ -157,13 +160,15 @@ xDF_out$stat$p
 
 Generate time series that are uncorrelated, but each time series is highly autocorrelated (i.e., the autocorrelation function of each time series is non-zero)
 
-```
+```r
 set.seed(1)
 Y <- RxDF::corrautocorr(mu = c(0, 0), 
                   sigR = 0,
                   sigC = list(c(0.6, 0.3, 0.2), c(0.5, 0.25, 0.1)),
                   Tt = 1000)
 ```
+
+Review the correlation between the two simulated time series:
 
 ```
 cor(t(Y))
@@ -172,19 +177,33 @@ cor(t(Y))
 [2,] -0.01662165  1.00000000
 ```
 
-```
+Run acutocorrelation function: 
+
+```r
 acf = RxDF::acf_fft(Y, 1000)
-acf$acor[1,1:10]
+```
+
+Check the autocorrelation function, for both timeseries, for four first lags:
+
+
+```
+acf$acor[1,1:4]
  [1]  1.000000000  0.591724895  0.296869664  0.193454466
 
-acf$acor[2,1:10]
+acf$acor[2,1:4]
  [1]  1.000000000  0.507665217  0.237327446  0.085485073 
 ``` 
 
+Run xDF:
+
+```r
+xDF_out <- RxDF::RxDF(Y, Tt = 1000)
+```
+
+Review z-scores and p-values:
+
 
 ```
-xDF_out <- RxDF::RxDF(Y, Tt = 1000)
-
 xDF_out$stat$z
            [,1]       [,2]
 [1,]  0.0000000 -0.3947852
@@ -201,13 +220,15 @@ xDF_out$stat$p
 
 Generate time series that are correlated and also each time series is highly autocorrelated. 
 
-```
+```r
 set.seed(1)
 Y <- RxDF::corrautocorr(mu = c(0, 0), 
                   sigR = 0.5,
                   sigC = list(c(0.6, 0.3, 0.2), c(0.5, 0.25, 0.1)),
                   Tt = 1000)
 ```
+
+
 
 ```
 cor(t(Y))
@@ -216,19 +237,28 @@ cor(t(Y))
 [2,] 0.4843995 1.0000000
 ```
 
-```
+```r
 acf = RxDF::acf_fft(Y, 1000)
+```
 
-acf$acor[1,1:10]
+```
+acf$acor[1,1:4]
  [1]  1.000000000  0.591724895  0.296869664  0.193454466
 
-acf$acor[2,1:10]
+acf$acor[2,1:4]
  [1]  1.00000000  0.49270660  0.25838924  0.12638006
 ``` 
 
-```
-xDF_out <- RxDF::RxDF(Y, Tt = 1000)
+Run xDF:
 
+```r
+xDF_out <- RxDF::RxDF(Y, Tt = 1000)
+```
+
+Review z-scores and p-values:
+
+
+```
 xDF_out$stat$z
          [,1]     [,2]
 [1,]  0.00000 11.52464
@@ -249,7 +279,9 @@ To be populated.
 
 xDF offers two key functions for estimation auto- and cross-correlations of time series. The function leverage Wiener–Khinchin theorem to estimate the acf functions. 
 
-```
+Simulate 256 time series, each of length 1000:
+
+```r
 library(microbenchmark)
 set.seed(1)
 M <- 1000
@@ -257,7 +289,9 @@ N <- 256
 Ym <- matrix(rnorm(M * N), nrow = M, ncol = N)
 ```
 
-```
+For a single time series, benchmark `RxDF()` against R stat's `acf()`:
+
+```r
 bench_single_timeseries <- microbenchmark(
   acf_fft = RxDF::acf_fft(Ym[,1], M),
   acf_native_single = acf(Ym[,1], 
@@ -266,6 +300,11 @@ bench_single_timeseries <- microbenchmark(
                             lag.max = M - 1),
   times = 100
 )
+```
+
+Check the run time for single timeseries using R stat's `acf()` and `RxDF()`:
+
+```
 print(bench_single_timeseries)
 
 
@@ -275,8 +314,9 @@ Unit: microseconds
  acf_native_single 494.255 510.1425 539.7215 519.7365 527.1575 1975.011   100
 ```
 
+Evaluate the run time for multiple time series:
 
-```
+```r
 acf_native_multiple <- function(Ym, M) {
   apply(Ym, 1, function(x) {
     acf(x, 
@@ -292,7 +332,11 @@ bench_multiple_timeseries <- microbenchmark(
   times = 100
 )
 print(bench_multiple_timeseries)
+```
 
+Check the run time for single timeseries using R stat's `acf()` and `RxDF()`:
+
+```
 Unit: milliseconds
                 expr      min       lq     mean   median       uq       max neval
              acf_fft 18.90551 23.45508 38.96694 27.04024 34.36702  99.91183   100
