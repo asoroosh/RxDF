@@ -7,21 +7,21 @@
 curb_taper_me(acs, Tt, M)
 }
 \arguments{
-\item{acs}{Numeric matrix. A matrix of size \verb{I × Tt}, where \code{I} is the number of timeseries
-and \code{Tt} is the number of lags (columns).}
+\item{acs}{Numeric matrix. A matrix of size `I × Tt`, where `I` is the number of timeseries
+and `Tt` is the number of lags (columns).}
 
 \item{Tt}{Integer. Number of lags (columns), used for consistency check.}
 
-\item{M}{Integer. Maximum lag to retain. All columns from \code{M+1} to \code{Tt} will be set to zero.}
+\item{M}{Integer. Maximum lag to retain. All columns from `M+1` to `Tt` will be set to zero.}
 }
 \value{
-A matrix of same dimensions as \code{acs} (\verb{I × Tt}), with values zeroed beyond lag \code{M}.
+A matrix of same dimensions as `acs` (`I × Tt`), with values zeroed beyond lag `M`.
 }
 \description{
 Performs a hard truncation ("curb taper") of autocorrelation or cross-correlation sequences
-by zeroing out all lag values beyond lag \code{M} for each timeseries.
+by zeroing out all lag values beyond lag `M` for each timeseries.
 }
 \details{
 This function implements the "curb taper" described by Anderson (1984) by simply truncating
-autocorrelation sequences at lag \code{M}. No gradual tapering is applied.
+autocorrelation sequences at lag `M`. No gradual tapering is applied.
 }

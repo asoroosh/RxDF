@@ -7,20 +7,20 @@
 ProdMat(Y0, Tt)
 }
 \arguments{
-\item{Y0}{Numeric matrix. A matrix of size \verb{Tt × n} or \verb{n × Tt}, where \code{Tt} is the number
-of timepoints and \code{n} is the number of timeseries. The function transposes \code{Y0} internally
+\item{Y0}{Numeric matrix. A matrix of size `Tt × n` or `n × Tt`, where `Tt` is the number
+of timepoints and `n` is the number of timeseries. The function transposes `Y0` internally
 if needed to ensure rows represent timepoints.}
 
-\item{Tt}{Integer. Number of timepoints (\code{Tt} should match one dimension of \code{Y0}).}
+\item{Tt}{Integer. Number of timepoints (`Tt` should match one dimension of `Y0`).}
 }
 \value{
-A 3D array of dimensions \verb{n × n × Tt}. For each timepoint \code{t}, the slice \code{PM0[ , , t]}
-contains the element-wise products of all pairs of timeseries at timepoint \code{t}.
+A 3D array of dimensions `n × n × Tt`. For each timepoint `t`, the slice `PM0[ , , t]`
+contains the element-wise products of all pairs of timeseries at timepoint `t`.
 The matrix is symmetric for each timepoint, and diagonal elements are set to zero.
 }
 \description{
 Computes a 3D array containing the element-wise products of all pairs of timeseries
-in a matrix \code{Y0}. For each timepoint, this function calculates the product of each pair
+in a matrix `Y0`. For each timepoint, this function calculates the product of each pair
 of timeseries values at that timepoint and stores them in a symmetric 2D matrix slice.
 The diagonal elements are set to zero.
 }

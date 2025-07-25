@@ -8,26 +8,24 @@ demean_ts(Y, dim = 2)
 }
 \arguments{
 \item{Y}{Numeric matrix. The data matrix to demean.
-Rows or columns represent separate time series depending on the \code{dim} argument.}
+Rows or columns represent separate time series depending on the `dim` argument.}
 
 \item{dim}{Integer. Direction along which to demean:
-\itemize{
-\item \code{dim = 1}: demean columns (subtract mean of each column),
-\item \code{dim = 2}: demean rows (subtract mean of each row, default).
-}}
+- `dim = 1`: demean columns (subtract mean of each column),
+- `dim = 2`: demean rows (subtract mean of each row, default).}
 }
 \value{
-Numeric matrix of the same dimensions as \code{Y} with means removed along the specified dimension.
+Numeric matrix of the same dimensions as `Y` with means removed along the specified dimension.
 }
 \description{
-Removes the mean from each row or column of a matrix \code{Y}.
+Removes the mean from each row or column of a matrix `Y`.
 This is useful for centering time series prior to further processing (e.g., autocorrelation, FFT).
-The dimension along which demeaning is performed is controlled by the \code{dim} argument.
+The dimension along which demeaning is performed is controlled by the `dim` argument.
 }
 \details{
-If \code{dim = 1}, each column is centered so that its mean is zero.
-If \code{dim = 2}, each row is centered so that its mean is zero.
-An error is raised if \code{dim} is not 1 or 2.
+If `dim = 1`, each column is centered so that its mean is zero.
+If `dim = 2`, each row is centered so that its mean is zero.
+An error is raised if `dim` is not 1 or 2.
 }
 \examples{
 set.seed(123)

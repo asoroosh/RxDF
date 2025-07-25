@@ -4,7 +4,7 @@
 \alias{acf_fft}
 \title{Fast Autocovariance and Autocorrelation Calculation Using FFT}
 \usage{
-acf_fft(Y, Tt, lag = NULL, pad = TRUE, bias_correction = TRUE)
+acf_fft(Y, Tt, lag = NULL, pad = TRUE, bias_correction = FALSE)
 }
 \arguments{
 \item{Y}{Numeric matrix. A matrix of size IxT where I is the number of time series (rows) and T is their length (columns).
@@ -12,35 +12,33 @@ Each row is treated as an individual time series.}
 
 \item{Tt}{Integer. The number of datapoints in the timeseries. Is always used for sanity checking.}
 
+\item{lag}{Optional integer vector of lags to return (not used in current implementation).}
+
 \item{pad}{Logical. If TRUE (default), zero-pads time series to next power of two for improved FFT performance.}
 
-\item{bias_correction}{Logical. If TRUE (default), applies unbiased lag-dependent normalization (scales by N / (N - k) at lag k) to match R's \code{acf(..., type = "correlation")}.}
-
-\item{lg}{Optional integer vector of lags to return (not used in current implementation).}
+\item{bias_correction}{Logical. If TRUE (default), applies unbiased lag-dependent normalization (scales by N / (N - k) at lag k) to match R's `acf(..., type = "correlation")`.}
 }
 \value{
 A list with:
-\itemize{
-\item \code{ACOV}: Autocovariance matrix of size IxTt (unbiased if \code{bias_correction = TRUE}).
-\item \code{ACOR}: Autocorrelation matrix of size IxTt (normalized by variance at lag 0).
-}
+  - `acov`: Autocovariance matrix of size IxTt (unbiased if `bias_correction = TRUE`).
+  - `acor`: Autocorrelation matrix of size IxTt (normalized by variance at lag 0).
 }
 \description{
 Computes autocovariance and autocorrelation functions efficiently for multiple time series using the Fast Fourier Transform (FFT).
-Optionally applies zero-padding for performance optimization and unbiased lag-specific normalization to match R's \code{acf()} behavior.
+Optionally applies zero-padding for performance optimization and unbiased lag-specific normalization to match R's `acf()` behavior.
 }
 \details{
 This function uses the Wiener–Khinchin theorem to compute autocovariance/autocorrelation via the FFT.
 The FFT implementation assumes periodic extension; proper bias correction ensures equivalence to the sample autocovariance
-definition used in R's \code{acf()} function.
+definition used in R's `acf()` function.
 
-If \code{pad = TRUE}, time series are explicitly zero-padded to length \code{2^nextpow2(2*T - 1)} to avoid wrap-around effects and optimize FFT speed.
-If \code{bias_correction = TRUE}, autocovariance estimates at lag k are rescaled by N / (N - k) to correct for the reduction in number of terms at larger lags.
+If `pad = TRUE`, time series are explicitly zero-padded to length `2^nextpow2(2*T - 1)` to avoid wrap-around effects and optimize FFT speed.
+If `bias_correction = TRUE`, autocovariance estimates at lag k are rescaled by N / (N - k) to correct for the reduction in number of terms at larger lags.
 }
 \examples{
 set.seed(123)
-Y <- matrix(rnorm(500), nrow = 5, ncol = 100)  # 5 time series of length 100
-result <- acf_fft(Y, Tt = 50, pad = TRUE, bias_correction = TRUE)
+Y <- matrix(stats::rnorm(500), nrow = 5, ncol = 100)  # 5 time series of length 100
+result <- acf_fft(Y, Tt = 100, pad = TRUE, bias_correction = TRUE)
 print(result$acor)
 print(result$acov)
 

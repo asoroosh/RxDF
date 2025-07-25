@@ -9,16 +9,14 @@ make_toeplitz(sigX, Tt)
 \arguments{
 \item{sigX}{Numeric vector. The off-diagonal entries to fill the Toeplitz matrix.}
 
-\item{ndp}{Integer. The desired size of the Toeplitz matrix (number of rows and columns).}
+\item{Tt}{Integer. The desired size of the Toeplitz matrix (number of rows and columns).}
 }
 \value{
-A numeric Toeplitz matrix of dimensions \verb{ndp x ndp} with the specified structure:
-\itemize{
-\item The main diagonal is filled with 1s.
-\item The first sub- and super-diagonals are filled with the first element of \code{sigX},
-the second sub- and super-diagonals with the second element of \code{sigX}, and so on.
-\item Any remaining diagonals are filled with 0 if \code{sigX} is shorter than \code{ndp - 1}.
-}
+A numeric Toeplitz matrix of dimensions `ndp x ndp` with the specified structure:
+- The main diagonal is filled with 1s.
+- The first sub- and super-diagonals are filled with the first element of `sigX`,
+  the second sub- and super-diagonals with the second element of `sigX`, and so on.
+- Any remaining diagonals are filled with 0 if `sigX` is shorter than `ndp - 1`.
 }
 \description{
 This function generates a Toeplitz matrix of a specified size, where the main diagonal

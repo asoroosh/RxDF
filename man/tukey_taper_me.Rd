@@ -7,21 +7,21 @@
 tukey_taper_me(acs, Tt, M = sqrt(Tt))
 }
 \arguments{
-\item{acs}{Numeric matrix. A matrix of size \verb{I × Tt}, where \code{I} is the number of time series (rows)
-and \code{Tt} is the number of lags (columns). Each row is treated as an independent sequence.}
+\item{acs}{Numeric matrix. A matrix of size `I × Tt`, where `I` is the number of time series (rows)
+and `Tt` is the number of lags (columns). Each row is treated as an independent sequence.}
 
 \item{Tt}{Integer. Number of lags (columns). Used to check consistency and ensure correct orientation.}
 
-\item{M}{Integer. Length of the taper window. The Tukey taper will be applied over columns 1 to \code{M}.
-Columns \code{M+1} to \code{Tt} are set to zero.}
+\item{M}{Integer. Length of the taper window. The Tukey taper will be applied over columns 1 to `M`.
+Columns `M+1` to `Tt` are set to zero.}
 }
 \value{
-A matrix of the same dimension as \code{acs} (\verb{I × Tt}), where each row has been multiplied by
-the Tukey taper in columns 1 to \code{M}, and zeros elsewhere.
+A matrix of the same dimension as `acs` (`I × Tt`), where each row has been multiplied by
+the Tukey taper in columns 1 to `M`, and zeros elsewhere.
 }
 \description{
-Applies a Tukey taper window to each row of a matrix \code{acs}, independently, over the first \code{M} columns (lags).
-After column \code{M}, all values are set to zero. This is typically used to smooth autocorrelation or cross-correlation
+Applies a Tukey taper window to each row of a matrix `acs`, independently, over the first `M` columns (lags).
+After column `M`, all values are set to zero. This is typically used to smooth autocorrelation or cross-correlation
 sequences to reduce variance from high lags.
 }
 \details{

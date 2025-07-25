@@ -13,13 +13,13 @@ check_dim(Y, Tt)
 \item{Tt}{Integer. The expected length of each time series (i.e., the number of time points).}
 }
 \value{
-A numeric matrix with \code{Tt} rows. If \code{Y} was a vector, it is converted
-to a matrix with one column. If \code{Y} is a matrix with \code{Tt} columns but
-not \code{Tt} rows, it is transposed.
+A numeric matrix with `Tt` rows. If `Y` was a vector, it is converted
+        to a matrix with one column. If `Y` is a matrix with `Tt` columns but
+        not `Tt` rows, it is transposed.
 }
 \description{
-This utility function checks and standardizes the input \code{Y} to ensure it has
-the expected time series length \code{Tt} as rows. It accepts either a vector
+This utility function checks and standardizes the input `Y` to ensure it has
+the expected time series length `Tt` as rows. It accepts either a vector
 (single time series) or a matrix (multiple time series).
 }
 \examples{

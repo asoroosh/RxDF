@@ -14,12 +14,12 @@ sim_many_ts_same_ar1(Tt, phi, n_series)
 \item{n_series}{Integer. Number of independent AR(1) series to simulate.}
 }
 \value{
-A numeric matrix of dimensions \code{Tt} x \code{n_series}, where each column
-corresponds to one simulated AR(1) time series.
+A numeric matrix of dimensions `Tt` x `n_series`, where each column
+        corresponds to one simulated AR(1) time series.
 }
 \description{
 Generates multiple independent realisations of an AR(1) (autoregressive of order 1)
-time series, each of length \code{Tt} and with the same autoregressive coefficient \code{phi}.
+time series, each of length `Tt` and with the same autoregressive coefficient `phi`.
 Each series is initialized with a standard normal value and evolves according to:
 \deqn{Y_t = \phi Y_{t-1} + \epsilon_t, \quad \epsilon_t \sim \mathcal{N}(0, 1)}
 }

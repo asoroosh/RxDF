@@ -10,7 +10,7 @@ nearestSPD(A)
 \item{A}{Numeric matrix. A square matrix to be converted to its nearest PSD matrix.}
 }
 \value{
-A numeric matrix that is positive semi-definite and as close as possible to the input matrix \code{A}.
+A numeric matrix that is positive semi-definite and as close as possible to the input matrix `A`.
 }
 \description{
 This function converts a square matrix to the nearest positive semi-definite (PSD) matrix

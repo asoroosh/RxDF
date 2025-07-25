@@ -7,35 +7,35 @@
 RxDF(Y, Tt, truncate = "adaptive", verbose = TRUE, TVflag = TRUE)
 }
 \arguments{
-\item{Y}{Numeric matrix of dimension \verb{nn × Tt}, where rows represent time series
+\item{Y}{Numeric matrix of dimension `nn × Tt`, where rows represent time series
 and columns represent timepoints.}
 
-\item{Tt}{Integer. Number of timepoints (columns of \code{Y}).}
+\item{Tt}{Integer. Number of timepoints (columns of `Y`).}
 
-\item{truncate}{Either \code{"adaptive"} for adaptive truncation based on significance
-of autocorrelations, or a numeric scalar specifying fixed truncation lag \code{M}.
-Default is \code{"adaptive"}.}
+\item{truncate}{Either `"adaptive"` for adaptive truncation based on significance
+of autocorrelations, or a numeric scalar specifying fixed truncation lag `M`.
+Default is `"adaptive"`.}
 
-\item{verbose}{Logical. If \code{TRUE} (default), prints progress and diagnostics.}
+\item{verbose}{Logical. If `TRUE` (default), prints progress and diagnostics.}
 
-\item{TVflag}{Logical. If \code{TRUE} (default), enforces minimum variance equal to
+\item{TVflag}{Logical. If `TRUE` (default), enforces minimum variance equal to
 textbook white noise variance when autocorrelation-adjusted variance falls below it.}
 }
 \value{
 A list with elements:
 \describe{
-\item{VarHatRho}{Matrix of robust variance estimates for all pairs of correlations
-(diagonal set to 0).}
-\item{Stat}{List containing:
-\describe{
-\item{z}{Matrix of Fisher-transformed z-statistics for each correlation.}
-\item{p}{Matrix of two-sided p-values corresponding to \code{z}.}
-\item{TV}{Matrix of textbook variance estimates under white noise assumption.}
-\item{EVE}{Indices of pairs where autocorrelation-adjusted variance was smaller
-than textbook variance (only if \code{TVflag = TRUE}).}
-\item{W2S}{Matrix of truncation lags used for each pair (only if \code{truncate = "adaptive"}).}
-}
-}
+  \item{VarHatRho}{Matrix of robust variance estimates for all pairs of correlations
+  (diagonal set to 0).}
+  \item{Stat}{List containing:
+    \describe{
+      \item{z}{Matrix of Fisher-transformed z-statistics for each correlation.}
+      \item{p}{Matrix of two-sided p-values corresponding to `z`.}
+      \item{TV}{Matrix of textbook variance estimates under white noise assumption.}
+      \item{EVE}{Indices of pairs where autocorrelation-adjusted variance was smaller
+      than textbook variance (only if `TVflag = TRUE`).}
+      \item{W2S}{Matrix of truncation lags used for each pair (only if `truncate = "adaptive"`).}
+    }
+  }
 }
 }
 \description{

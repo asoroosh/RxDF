@@ -54,10 +54,10 @@ RxDF <- function(Y,
   nn <- nrow(Y)
 
   # Standardize each row
-  Y <- Y/apply(Y, 1, sd)
+  Y <- Y/apply(Y, 1, stats::sd)
 
   # Correlation matrix
-  rho <- cor(t(Y))
+  rho <- stats::cor(t(Y))
   diag(rho) <- 0
 
   # Autocorrelation matrix
@@ -143,7 +143,7 @@ RxDF <- function(Y,
   rzf <- rf / sqrt(sf)
   diag(rzf) <- 0
 
-  f_pval <- 2 * pnorm(-abs(rzf))
+  f_pval <- 2 * stats::pnorm(-abs(rzf))
   diag(f_pval) <- 0
 
   Stat$z <- rzf

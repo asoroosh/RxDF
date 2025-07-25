@@ -6,13 +6,13 @@
 #' @param Y Numeric matrix. A matrix of size IxT where I is the number of time series (rows) and T is their length (columns).
 #'          Each row is treated as an individual time series.
 #' @param Tt Integer. The number of datapoints in the timeseries. Is always used for sanity checking.
-#' @param lg Optional integer vector of lags to return (not used in current implementation).
+#' @param lag Optional integer vector of lags to return (not used in current implementation).
 #' @param pad Logical. If TRUE (default), zero-pads time series to next power of two for improved FFT performance.
 #' @param bias_correction Logical. If TRUE (default), applies unbiased lag-dependent normalization (scales by N / (N - k) at lag k) to match R's `acf(..., type = "correlation")`.
 #'
 #' @return A list with:
-#'   - `ACOV`: Autocovariance matrix of size IxTt (unbiased if `bias_correction = TRUE`).
-#'   - `ACOR`: Autocorrelation matrix of size IxTt (normalized by variance at lag 0).
+#'   - `acov`: Autocovariance matrix of size IxTt (unbiased if `bias_correction = TRUE`).
+#'   - `acor`: Autocorrelation matrix of size IxTt (normalized by variance at lag 0).
 #'
 #' @details
 #' This function uses the Wiener–Khinchin theorem to compute autocovariance/autocorrelation via the FFT.
@@ -24,8 +24,8 @@
 #'
 #' @examples
 #' set.seed(123)
-#' Y <- matrix(rnorm(500), nrow = 5, ncol = 100)  # 5 time series of length 100
-#' result <- acf_fft(Y, Tt = 50, pad = TRUE, bias_correction = TRUE)
+#' Y <- matrix(stats::rnorm(500), nrow = 5, ncol = 100)  # 5 time series of length 100
+#' result <- acf_fft(Y, Tt = 100, pad = TRUE, bias_correction = TRUE)
 #' print(result$acor)
 #' print(result$acov)
 #'
@@ -35,7 +35,7 @@ acf_fft <- function(Y,
                    Tt,
                    lag = NULL,
                    pad = TRUE,
-                   bias_correction = TRUE) {
+                   bias_correction = FALSE) {
 
 
   Y <- check_dim(Y, Tt)
@@ -51,10 +51,10 @@ acf_fft <- function(Y,
   }
 
   # Rows = timeseries
-  yfft <- (t(mvfft(t(Y_padded))))
+  yfft <- (t(stats::mvfft(t(Y_padded))))
   yspec <- yfft * Conj(yfft)
 
-  acov_biased <- t(Re((mvfft(t(yspec), inverse = TRUE))))/ (nfft*nfft)
+  acov_biased <- t(Re((stats::mvfft(t(yspec), inverse = TRUE))))/ (nfft*nfft)
   acov_biased <- acov_biased[,1:Tt, drop = FALSE]
 
   if (bias_correction){
@@ -75,7 +75,7 @@ acf_fft <- function(Y,
   }
 
   # Compute 95% confidence intervals for autocorrelations
-  bnd <- (sqrt(2) * qnorm(0.975)) / sqrt(Tt)  # Assuming normality
+  bnd <- (sqrt(2) * stats::qnorm(0.975)) / sqrt(Tt)  # Assuming normality
   CI <- c(-bnd, bnd)
 
   # Return results as a list
@@ -119,7 +119,7 @@ acf_fft <- function(Y,
 #'
 #' @examples
 #' set.seed(123)
-#' Y <- matrix(rnorm(4 * 100), nrow = 4)
+#' Y <- matrix(stats::rnorm(4 * 100), nrow = 4)
 #' result <- xacf_fft(Y, Tt = 100)
 #' dim(result$xC)  # should be 4 x 4 x 199 for default lags
 #' result$lidx[which.max(result$lidx == 0)]  # lag 0
@@ -159,7 +159,7 @@ xacf_fft <- function(Y, Tt,
   }
 
   # Compute FFT along rows
-  Yf <- t(mvfft(t(Y_padded)))
+  Yf <- t(stats::mvfft(t(Y_padded)))
 
   # Initialize output
   mxLcc <- (mxL - 1) * 2 + 1
@@ -176,7 +176,7 @@ xacf_fft <- function(Y, Tt,
     j <- as.numeric(idx[k, 2])
 
     # Cross-correlation via inverse FFT
-    cxy <- fft(Yf[i, ] * Conj(Yf[j, ]), inverse = TRUE)/nfft
+    cxy <- stats::fft(Yf[i, ] * Conj(Yf[j, ]), inverse = TRUE)/nfft
     cxy <- Re(cxy)
 
     # Normalize length and wrap-around
@@ -232,7 +232,8 @@ xacf_fft <- function(Y, Tt,
 #'
 #' @param Y Numeric matrix. A time series dataset where rows represent time points
 #'   and columns represent variables (e.g., nodes or subjects).
-#' @param T Integer. The number of time points in the time series.
+#' @param Tt Integer. The number of time points in the time series.
+#' @param n_sim Integer. Number of time series for Monte Carlo simulations.
 #' @return A list containing:
 #'   - `V`: Estimated variance of the null data correlations.
 #'   - `Z`: Fisher-transformed correlation matrix scaled by the correction factor.
@@ -245,7 +246,7 @@ xacf_fft <- function(Y, Tt,
 #' under Serial Correlation." bioRxiv (2018): 453795.
 #' @examples
 #' set.seed(123)
-#' Y <- matrix(rnorm(500), nrow = 100, ncol = 5)  # Example time series dataset
+#' Y <- matrix(stats::rnorm(500), nrow = 100, ncol = 5)  # Example time series dataset
 #' T <- nrow(Y)
 #' result <- AR1MC(Y, T)
 #' print(result$V)
@@ -257,22 +258,22 @@ AR1MC <- function(Y, Tt, n_sim = 50) {
   Y <- demean_ts(Y, dim = 2)
 
   arone <- est_rough_ar1(Y, Tt)
-  arone0 <- median(arone)
-  netmat <- cor(t(Y))
+  arone0 <- stats::median(arone)
+  netmat <- stats::cor(t(Y))
 
   # Create null data using the estimated AR(1) coefficient
   Yr <- sim_many_ts_same_ar1(Tt, arone0, n_sim)
 
   # Compute null correlations
-  Yr_corr <- cor(t(Yr))
+  Yr_corr <- stats::cor(t(Yr))
 
   # Extract upper triangular elements (excluding diagonal)
   IDX <- which(upper.tri(matrix(1, n_sim, n_sim)))
   Yrc <- Yr_corr[IDX]
 
   # Compute variance and correction factor
-  V <- var(Yrc)
-  R2Zcrt <- 1 / sd(atanh(Yrc))
+  V <- stats::var(Yrc)
+  R2Zcrt <- 1 / stats::sd(atanh(Yrc))
 
   f2p <- fisher_pval_matrix(netmat, R2Zcrt)
 

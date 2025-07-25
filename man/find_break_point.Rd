@@ -7,22 +7,20 @@
 find_break_point(acs, Tt)
 }
 \arguments{
-\item{acs}{Numeric vector of length \code{Tt}. The autocorrelation sequence (lags 1 to \code{Tt}).}
+\item{acs}{Numeric vector of length `Tt`. The autocorrelation sequence (lags 1 to `Tt`).}
 
 \item{Tt}{Integer. Total number of lags. Used for consistency check and orientation.}
 }
 \value{
-Integer scalar \code{where2stop} indicating the largest lag before autocorrelation
+Integer scalar `where2stop` indicating the largest lag before autocorrelation
 becomes insignificant:
-\itemize{
-\item If all autocorrelations are significant ⇒ returns \code{Tt}.
-\item If autocorrelation is insignificant from the start ⇒ returns 0.
-\item Otherwise ⇒ returns index of last significant lag before first insignificance.
-}
+- If all autocorrelations are significant ⇒ returns `Tt`.
+- If autocorrelation is insignificant from the start ⇒ returns 0.
+- Otherwise ⇒ returns index of last significant lag before first insignificance.
 }
 \description{
 Determines the lag index at which the absolute autocorrelation sequence first falls
-below an approximate 95\% confidence bound for white noise. This identifies where
+below an approximate 95% confidence bound for white noise. This identifies where
 autocorrelation ceases to be statistically significant and can serve as a heuristic
 cutoff for truncating or tapering.
 }
@@ -31,10 +29,10 @@ The threshold for significance is defined as:
 \deqn{
   \text{bound} = \frac{1.96}{\sqrt{Tt}}
 }
-corresponding to the 95\% confidence bound for white noise autocorrelations.
+corresponding to the 95% confidence bound for white noise autocorrelations.
 
-The function checks when \verb{|acs| <= bound} and reports the first lag where this occurs,
-then returns \code{where2stop} as the lag immediately preceding that point.
+The function checks when `|acs| <= bound` and reports the first lag where this occurs,
+then returns `where2stop` as the lag immediately preceding that point.
 }
 \examples{
 set.seed(123)

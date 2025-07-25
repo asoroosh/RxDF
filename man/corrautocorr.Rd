@@ -13,15 +13,13 @@ corrautocorr(mu, sigR, sigC, Tt, verboseflag = TRUE)
 are required, a scalar indicating the off-diagonal elements suffices.}
 
 \item{sigC}{Numeric vector, list of vectors, or matrix. Covariance of columns (serial correlation).
-\itemize{
-\item If a vector, it is converted to a Toeplitz matrix for universal AC structure across all time series.
-\item If a list of vectors, each vector specifies the autocorrelation structure for a specific time series.
-\item If a matrix, it is treated as a universal AC structure for all time series.
-}}
+- If a vector, it is converted to a Toeplitz matrix for universal AC structure across all time series.
+- If a list of vectors, each vector specifies the autocorrelation structure for a specific time series.
+- If a matrix, it is treated as a universal AC structure for all time series.}
+
+\item{Tt}{Integer. Number of data points (length of time series).}
 
 \item{verboseflag}{Logical. If TRUE, warnings about non-PSD matrices will be printed. Default is TRUE.}
-
-\item{ndp}{Integer. Number of data points (length of time series).}
 }
 \value{
 A numeric matrix where each row represents a time series.

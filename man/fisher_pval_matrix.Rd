@@ -11,11 +11,11 @@ fisher_pval_matrix(netmat, R2Zcrt)
 (typically symmetric, with values between -1 and 1).}
 
 \item{R2Zcrt}{Numeric. A correction factor to scale the Fisher-transformed values
-(e.g., \eqn{\sqrt{df - 3}} where \code{df} is the degrees of freedom).}
+(e.g., \eqn{\sqrt{df - 3}} where `df` is the degrees of freedom).}
 }
 \value{
-A matrix of the same dimensions as \code{netmat}, containing two-tailed
-p-values for each correlation.
+A matrix of the same dimensions as `netmat`, containing two-tailed
+        p-values for each correlation.
 }
 \description{
 Applies the Fisher Z-transformation to a correlation matrix and computes

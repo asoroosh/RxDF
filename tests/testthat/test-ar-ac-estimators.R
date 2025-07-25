@@ -1,5 +1,3 @@
-# tests/testthat/test-ar-ac-estimators.R
-library(testthat)
 
 ######################################
 # test-RxDF.R

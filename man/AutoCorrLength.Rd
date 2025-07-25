@@ -7,9 +7,9 @@
 AutoCorrLength(Y, nlag)
 }
 \arguments{
-\item{ts}{Numeric vector. The time series for which the autocorrelation length is calculated.}
+\item{Y}{Numeric vector. The time series for which the autocorrelation length is calculated.}
 
-\item{T}{Integer. The maximum number of lags to consider in the autocorrelation function.}
+\item{nlag}{Integer. The maximum number of lags to consider in the autocorrelation function.}
 }
 \value{
 A single numeric value representing the autocorrelation length.
@@ -22,8 +22,8 @@ The implementation is adapted from Straatsma et al. (2016).
 }
 \examples{
 Y <- rnorm(100)  # Example time series
-T <- 50           # Number of lags
-autocorr_length <- AutoCorrLength(Y, T)
+nlag <- 50       # Number of lags
+autocorr_length <- AutoCorrLength(Y, nlag)
 print(autocorr_length)
 
 }

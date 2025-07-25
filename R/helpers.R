@@ -19,9 +19,9 @@
 #' @export
 sim_ar1 <- function(Tt, phi) {
   y <- numeric(Tt)
-  y[1] <- rnorm(1)
+  y[1] <- stats::rnorm(1)
   for (t in 2:Tt) {
-    y[t] <- phi * y[t - 1] + rnorm(1)
+    y[t] <- phi * y[t - 1] + stats::rnorm(1)
   }
   return(y)
 }
@@ -183,7 +183,7 @@ est_rough_ar1 <- function(Y, Tt){
 fisher_pval_matrix <- function(netmat, R2Zcrt) {
   # NB! for rho = 1, atanh will be Inf
   Z <- atanh(netmat) * R2Zcrt
-  P <- 2 * pnorm(-abs(Z))
+  P <- 2 * stats::pnorm(-abs(Z))
   return(list(Z = Z, P = P))
 }
 
@@ -193,8 +193,8 @@ fisher_pval_matrix <- function(netmat, R2Zcrt) {
 #' This function generates a time series with first-order autoregressive (AR(1)) correlation.
 #'
 #' @param ar1 Numeric. The first-order autoregressive coefficient. Must be between -1 and 1 for stationarity.
-#' @param ndpr Integer. The number of time points in the generated time series. Must be a positive integer.
-#' @return A numeric vector of length `ndpr`, representing the generated time series.
+#' @param Tt Integer. The number of time points in the generated time series. Must be a positive integer.
+#' @return A numeric vector of length `Tt`, representing the generated time series.
 #' @examples
 #' # Generate an AR(1) time series with coefficient 0.8 and 100 time points
 #' ts <- GenTsAC1(0.8, 100)
@@ -215,9 +215,9 @@ GenTsAC1 <- function(ar1, Tt) {
 
   # Initialize the time series
   ts = numeric(Tt)
-  ts[1] = rnorm(1)
+  ts[1] = stats::rnorm(1)
   for (t in 2:Tt) {
-    ts[t] = ts[t - 1] * ar1 + rnorm(1)
+    ts[t] = ts[t - 1] * ar1 + stats::rnorm(1)
   }
   return(ts)
 }
@@ -236,7 +236,7 @@ GenTsAC1 <- function(ar1, Tt) {
 #'   - If a vector, it is converted to a Toeplitz matrix for universal AC structure across all time series.
 #'   - If a list of vectors, each vector specifies the autocorrelation structure for a specific time series.
 #'   - If a matrix, it is treated as a universal AC structure for all time series.
-#' @param ndp Integer. Number of data points (length of time series).
+#' @param Tt Integer. Number of data points (length of time series).
 #' @param verboseflag Logical. If TRUE, warnings about non-PSD matrices will be printed. Default is TRUE.
 #' @return A numeric matrix where each row represents a time series.
 #' @examples
@@ -294,7 +294,9 @@ corrautocorr <- function(mu,
   )
 
   # Generate random data and apply transformations
-  z <- matrix(rnorm(length(mu) * Tt), nrow = length(mu), ncol = Tt)
+  z <- matrix(stats::rnorm(length(mu) * Tt),
+              nrow = length(mu), ncol = Tt)
+
   MVDisk <- t(CsigR) %*% z
 
   # Handle `sigC` as a list of Toeplitz matrices
@@ -401,7 +403,7 @@ is_scalar <- function(x) {
 #' matrix size exceeds the length of the vector, the remaining entries are set to 0.
 #'
 #' @param sigX Numeric vector. The off-diagonal entries to fill the Toeplitz matrix.
-#' @param ndp Integer. The desired size of the Toeplitz matrix (number of rows and columns).
+#' @param Tt Integer. The desired size of the Toeplitz matrix (number of rows and columns).
 #' @return A numeric Toeplitz matrix of dimensions `ndp x ndp` with the specified structure:
 #' - The main diagonal is filled with 1s.
 #' - The first sub- and super-diagonals are filled with the first element of `sigX`,
@@ -419,7 +421,7 @@ is_scalar <- function(x) {
 make_toeplitz <- function(sigX, Tt) {
   diag_values = c(1, sigX)
   full_values = c(diag_values, rep(0, Tt - length(diag_values)))  # Extend with zeros
-  toeplitz_matrix <- toeplitz(full_values[1:Tt])  # Ensure size matches Tt
+  toeplitz_matrix <- stats::toeplitz(full_values[1:Tt])  # Ensure size matches Tt
   return(toeplitz_matrix)
 }
 
@@ -430,8 +432,8 @@ make_toeplitz <- function(sigX, Tt) {
 #' of the autocorrelation function (ACF) up to a specified number of lags.
 #' The implementation is adapted from Straatsma et al. (2016).
 #'
-#' @param ts Numeric vector. The time series for which the autocorrelation length is calculated.
-#' @param T Integer. The maximum number of lags to consider in the autocorrelation function.
+#' @param Y Numeric vector. The time series for which the autocorrelation length is calculated.
+#' @param nlag Integer. The maximum number of lags to consider in the autocorrelation function.
 #' @return A single numeric value representing the autocorrelation length.
 #' @references
 #' Straatsma, T. P., Berendsen, H. J. C., & Stam, A. J. (2016).
@@ -443,8 +445,8 @@ make_toeplitz <- function(sigX, Tt) {
 #' under Serial Correlation." bioRxiv (2018): 453795.
 #' @examples
 #' Y <- rnorm(100)  # Example time series
-#' T <- 50           # Number of lags
-#' autocorr_length <- AutoCorrLength(Y, T)
+#' nlag <- 50       # Number of lags
+#' autocorr_length <- AutoCorrLength(Y, nlag)
 #' print(autocorr_length)
 #'
 #' @export
@@ -453,9 +455,10 @@ AutoCorrLength <- function(Y, nlag) {
   if (!is.numeric(Y)) stop("The input time series must be numeric.")
   if (!is.numeric(nlag) || nlag <= 0 || nlag != round(nlag)) stop("T must be a positive integer.")
 
-  acf_values <- acf(Y,
-                    lag.max = nlag,
-                    plot = FALSE)$acf[-1]
+  acf_values <- stats::acf(Y,
+                           lag.max = nlag,
+                           plot = FALSE,
+                           demean = T)$acf[-1]
   CorrLeng <- sum(acf_values^2)
   return(CorrLeng)
 }
@@ -649,7 +652,7 @@ find_break_point <- function(acs, Tt) {
   acs <- check_dim(acs,Tt)
 
   # 95% confidence bound for white noise
-  bnd <- qnorm(0.975) / sqrt(Tt)
+  bnd <- stats::qnorm(0.975) / sqrt(Tt)
 
   # Find first lag where abs(acs) <= bnd
   first_below <- which(abs(acs) <= bnd)[1]

@@ -1,5 +1,3 @@
-# tests/testthat/aux_files_tests.R
-library(testthat)
 
 ######################################
 # test-demean_ts

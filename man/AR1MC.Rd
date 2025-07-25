@@ -4,23 +4,23 @@
 \alias{AR1MC}
 \title{AR(1) Monte Carlo Estimation of Unbiased Variance}
 \usage{
-AR1MC(Y, Tt, n_sim = 1000)
+AR1MC(Y, Tt, n_sim = 50)
 }
 \arguments{
 \item{Y}{Numeric matrix. A time series dataset where rows represent time points
 and columns represent variables (e.g., nodes or subjects).}
 
-\item{T}{Integer. The number of time points in the time series.}
+\item{Tt}{Integer. The number of time points in the time series.}
+
+\item{n_sim}{Integer. Number of time series for Monte Carlo simulations.}
 }
 \value{
 A list containing:
-\itemize{
-\item \code{V}: Estimated variance of the null data correlations.
-\item \code{Z}: Fisher-transformed correlation matrix scaled by the correction factor.
-\item \code{P}: Two-tailed p-values for the transformed correlations.
-\item \code{R2Zcrt}: Correction factor derived from the standard deviation of null data.
-\item \code{arone}: Estimated AR(1) coefficients for each column in the input data.
-}
+  - `V`: Estimated variance of the null data correlations.
+  - `Z`: Fisher-transformed correlation matrix scaled by the correction factor.
+  - `P`: Two-tailed p-values for the transformed correlations.
+  - `R2Zcrt`: Correction factor derived from the standard deviation of null data.
+  - `arone`: Estimated AR(1) coefficients for each column in the input data.
 }
 \description{
 This function estimates the AR(1) coefficient and computes the variance correction
@@ -29,7 +29,7 @@ from the FSLnets toolbox and designed for estimating global correction factors.
 }
 \examples{
 set.seed(123)
-Y <- matrix(rnorm(500), nrow = 100, ncol = 5)  # Example time series dataset
+Y <- matrix(stats::rnorm(500), nrow = 100, ncol = 5)  # Example time series dataset
 T <- nrow(Y)
 result <- AR1MC(Y, T)
 print(result$V)

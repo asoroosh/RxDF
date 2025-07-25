@@ -8,12 +8,12 @@ est_rough_ar1(Y, Tt)
 }
 \arguments{
 \item{Y}{A numeric vector (single time series) or matrix (multiple series), where
-each column is a time series of length \code{Tt}.}
+each column is a time series of length `Tt`.}
 
 \item{Tt}{Integer. The expected length (number of time points) of each time series.}
 }
 \value{
-A numeric vector of estimated AR(1) coefficients, one per column of \code{Y}.
+A numeric vector of estimated AR(1) coefficients, one per column of `Y`.
 }
 \description{
 Computes rough estimates of AR(1) coefficients for one or more time series using
@@ -23,9 +23,9 @@ This method is fast and suitable for simulations but does not correspond to
 the ordinary least squares (OLS) estimator. Use with caution for inference.
 }
 \details{
-If \code{Y} is a vector, it is first converted into a matrix with one column.
-If \code{Y} is not in column-wise format, an attempt is made to transpose it
-so that each column corresponds to a time series of length \code{Tt}.
+If `Y` is a vector, it is first converted into a matrix with one column.
+         If `Y` is not in column-wise format, an attempt is made to transpose it
+         so that each column corresponds to a time series of length `Tt`.
 }
 \examples{
 Y <- sim_many_ts_same_ar1(100, 0.6, 10)

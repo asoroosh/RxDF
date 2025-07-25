@@ -9,10 +9,10 @@ GenTsAC1(ar1, Tt)
 \arguments{
 \item{ar1}{Numeric. The first-order autoregressive coefficient. Must be between -1 and 1 for stationarity.}
 
-\item{ndpr}{Integer. The number of time points in the generated time series. Must be a positive integer.}
+\item{Tt}{Integer. The number of time points in the generated time series. Must be a positive integer.}
 }
 \value{
-A numeric vector of length \code{ndpr}, representing the generated time series.
+A numeric vector of length `Tt`, representing the generated time series.
 }
 \description{
 This function generates a time series with first-order autoregressive (AR(1)) correlation.

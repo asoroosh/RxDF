@@ -10,7 +10,7 @@ is_scalar(x)
 \item{x}{Any R object. The object to be checked.}
 }
 \value{
-A logical value: \code{TRUE} if the input is a numeric scalar, otherwise \code{FALSE}.
+A logical value: `TRUE` if the input is a numeric scalar, otherwise `FALSE`.
 }
 \description{
 This function checks whether the input is a numeric scalar.

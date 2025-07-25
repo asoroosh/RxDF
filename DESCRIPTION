@@ -1,10 +1,20 @@
 Package: RxDF
-Title: xDF estimates variance of Pearson's correlations among highly autocorrelated time series.
+Type: Package
+Title: xDF estimates variance of Pearson's correlations among highly autocorrelated time series
 Version: 0.0.0.9000
 Authors@R: 
-    person("Soroosh", "Afyouni", , "srafyouni@gmail.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person(given = "Soroosh", 
+           family = "Afyouni", 
+           email = "srafyouni@gmail.com", 
+           role = c("aut", "cre"))
+Description: Methods for estimating robust correlation variance in the presence of autocorrelation and cross-correlation, based on the xDF method from Afyouni et al. (2019).
 License: GPL (>= 3)
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Depends: 
+    R (>= 4.3)
+Suggests: 
+    testthat (>= 3.0.0),
+    microbenchmark,
+    waldo
+Config/testthat/edition: 3

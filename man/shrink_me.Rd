@@ -8,24 +8,22 @@ shrink_me(acs, Tt)
 }
 \arguments{
 \item{acs}{Numeric vector or matrix representing a single autocorrelation sequence.
-Length must equal \code{Tt}. If input is a matrix, it must be 1 row or column.}
+Length must equal `Tt`. If input is a matrix, it must be 1 row or column.}
 
-\item{Tt}{Integer. Number of lags (length of \code{acs}).}
+\item{Tt}{Integer. Number of lags (length of `acs`).}
 }
 \value{
-Numeric vector of length \code{Tt} containing the shrunk autocorrelation sequence.
+Numeric vector of length `Tt` containing the shrunk autocorrelation sequence.
 }
 \description{
 Applies an adaptive truncation ("shrinkage") procedure to an autocorrelation sequence.
-It identifies the first lag where autocorrelations fall below a 95\% confidence bound
+It identifies the first lag where autocorrelations fall below a 95% confidence bound
 and sets all subsequent lags to zero.
 }
 \details{
-\itemize{
-\item If all autocorrelations are below the confidence bound from the beginning, returns all zeros.
-\item Uses \code{find_break_point()} internally to determine truncation point.
-\item Calls \code{curb_taper_me()} internally for hard truncation at the break point.
-}
+- If all autocorrelations are below the confidence bound from the beginning, returns all zeros.
+- Uses `find_break_point()` internally to determine truncation point.
+- Calls `curb_taper_me()` internally for hard truncation at the break point.
 }
 \seealso{
 \code{\link{find_break_point}}, \code{\link{curb_taper_me}}

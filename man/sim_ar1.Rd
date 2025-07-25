@@ -12,7 +12,7 @@ sim_ar1(Tt, phi)
 \item{phi}{Numeric. AR(1) coefficient (typically between -1 and 1 for stationarity).}
 }
 \value{
-A numeric vector of length \code{Tt} representing the simulated AR(1) time series.
+A numeric vector of length `Tt` representing the simulated AR(1) time series.
 }
 \description{
 Generates a single autoregressive time series of order 1 (AR(1)) with

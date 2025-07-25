@@ -7,44 +7,44 @@
 xacf_fft(Y, Tt, lag = NULL, pad = TRUE)
 }
 \arguments{
-\item{Y}{Numeric matrix. A matrix of size \verb{I × Tt} where \code{I} is the number of timeseries (rows)
-and \code{Tt} is the number of datapoints (columns). Each row is treated as a separate timeseries.}
+\item{Y}{Numeric matrix. A matrix of size `I × Tt` where `I` is the number of timeseries (rows)
+and `Tt` is the number of datapoints (columns). Each row is treated as a separate timeseries.}
 
-\item{Tt}{Integer. Number of datapoints (columns) in \code{Y}, used for consistency check.}
+\item{Tt}{Integer. Number of datapoints (columns) in `Y`, used for consistency check.}
 
-\item{lag}{Optional integer. Maximum lag to compute. If \code{NULL} (default), computes up to \code{Tt - 1}.
-If \code{lag = 0}, returns only the lag 0 correlation matrix (Pearson's correlation).}
+\item{lag}{Optional integer. Maximum lag to compute. If `NULL` (default), computes up to `Tt - 1`.
+If `lag = 0`, returns only the lag 0 correlation matrix (Pearson's correlation).}
 
-\item{pad}{Logical (default \code{TRUE}). If \code{TRUE}, zero-pads each timeseries to the next power-of-two
+\item{pad}{Logical (default `TRUE`). If `TRUE`, zero-pads each timeseries to the next power-of-two
 length sufficient for efficient FFT and to avoid circular wrap-around effects.}
 }
 \value{
 A list with:
 \describe{
-\item{xC}{3D array of dimension \verb{I × I × L}, where \code{L = 2 * (lag - 1) + 1}.
-Each slice \code{xC[, , k]} gives the cross-correlation matrix at lag \code{lidx[k]}.
-Symmetric property ensured: \code{xC[i, j, k] = xC[j, i, k]}. Diagonal entries contain autocorrelations.}
-\item{lidx}{Integer vector of lag indices corresponding to the third dimension of \code{xC},
-ranging from \code{-(lag - 1)} to \code{lag - 1}.}
+  \item{xC}{3D array of dimension `I × I × L`, where `L = 2 * (lag - 1) + 1`.
+  Each slice `xC[, , k]` gives the cross-correlation matrix at lag `lidx[k]`.
+  Symmetric property ensured: `xC[i, j, k] = xC[j, i, k]`. Diagonal entries contain autocorrelations.}
+  \item{lidx}{Integer vector of lag indices corresponding to the third dimension of `xC`,
+  ranging from `-(lag - 1)` to `lag - 1`.}
 }
 }
 \description{
-Computes full-lag cross-correlation sequences between all pairs of timeseries in \code{Y}
+Computes full-lag cross-correlation sequences between all pairs of timeseries in `Y`
 using the Fast Fourier Transform (FFT), efficiently handling multi-dimensional data.
 The function supports optional zero-padding for performance and returns results
 normalized to unit variance at lag 0 (Pearson correlation at lag 0).
 }
 \details{
-The cross-correlation at lag 0 (\code{lidx == 0}) exactly matches Pearson's correlation matrix.
-Autocorrelations (diagonal entries) are normalized such that \code{xC[i, i, lag = 0] = 1}.
+The cross-correlation at lag 0 (`lidx == 0`) exactly matches Pearson's correlation matrix.
+Autocorrelations (diagonal entries) are normalized such that `xC[i, i, lag = 0] = 1`.
 
-If \code{pad = TRUE}, time series are zero-padded to length \code{2^nextpow2(2 * Tt - 1)} before FFT.
+If `pad = TRUE`, time series are zero-padded to length `2^nextpow2(2 * Tt - 1)` before FFT.
 
-The output \code{xC} is fully symmetric across rows and columns for all lags.
+The output `xC` is fully symmetric across rows and columns for all lags.
 }
 \examples{
 set.seed(123)
-Y <- matrix(rnorm(4 * 100), nrow = 4)
+Y <- matrix(stats::rnorm(4 * 100), nrow = 4)
 result <- xacf_fft(Y, Tt = 100)
 dim(result$xC)  # should be 4 x 4 x 199 for default lags
 result$lidx[which.max(result$lidx == 0)]  # lag 0
