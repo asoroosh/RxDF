@@ -2,6 +2,7 @@
 ######################################
 # test-RxDF.R
 ######################################
+library(RxDF)
 
 test_that("RxDF works correctly on white noise", {
   set.seed(1)

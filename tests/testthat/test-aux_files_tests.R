@@ -2,6 +2,7 @@
 ######################################
 # test-demean_ts
 ######################################
+library(RxDF)
 
 test_that("demean_ts correctly demeans rows when dim=2", {
   Y <- matrix(1:12, nrow = 3, byrow = TRUE)  # 3 rows, 4 columns
