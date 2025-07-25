@@ -50,8 +50,8 @@ jobs:
       - name: R CMD check
         uses: r-lib/actions/check-r-package@v2
         with:
-          error-on: error
-          args: --no-manual
+          error-on: "error"
+          args: "--no-manual"
 
       - name: Upload check results on failure
         if: failure()
