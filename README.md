@@ -1,4 +1,4 @@
-# RxDF -- WIP WIP WIP
+# RxDF
 
 # Effective Degrees of Freedom of the Pearson's Correlation Coefficient under Serial Correlation
 
@@ -28,6 +28,10 @@ The `RxDF()` function can be used to:
 * Calculate z-statistics maps for large-scale correlation matrices (e.g., functional connectivity)
 * Estimate accurate p-values for correlation coefficients, accounting for autocorrelation
 
+### Why does it matter? <a name="why"></a>
+
+The dependence between pairs of time series is commonly quantified by Pearson's correlation. However, if the time series are themselves dependent (i.e., exhibit temporal autocorrelation), the effective degrees of freedom (EDF) are reduced, the standard error of the sample correlation coefficient is biased, and Fisher's transformation fails to stabilise the variance. 
+
 ## Installation <a name="installation"></a>
 To install RxDF you can clone and install the package using `devtools`:
 
@@ -44,6 +48,7 @@ Generate five time series of length 1000, with no correlation or autocorrelation
 
 
 ```r
+set.seed(1)
 Y <- matrix(rnorm(1000 * 5), nrow = 5)
 xDF_out <- RxDF::RxDF(Y, Tt = 1000)
 ```
@@ -52,23 +57,23 @@ Z-scores and p-values of pairwise correlations:
 
 ```
 xDF_out$stat$z
-           [,1]         [,2]       [,3]       [,4]         [,5]
-[1,]  0.0000000 -0.596202179 -1.5305090 -0.1491905  0.124873392
-[2,] -0.5962022  0.000000000 -1.2460740 -0.2263384 -0.002191868
-[3,] -1.5305090 -1.246073982  0.0000000 -0.6070897 -0.174628166
-[4,] -0.1491905 -0.226338431 -0.6070897  0.0000000  0.273672755
-[5,]  0.1248734 -0.002191868 -0.1746282  0.2736728  0.000000000
+           [,1]       [,2]       [,3]         [,4]         [,5]
+[1,]  0.0000000 -0.4768183  1.1914714  0.101135382  0.873463857
+[2,] -0.4768183  0.0000000 -1.4767050  0.113717428  0.211015471
+[3,]  1.1914714 -1.4767050  0.0000000  1.575651760 -0.710217772
+[4,]  0.1011354  0.1137174  1.5756518  0.000000000 -0.002800874
+[5,]  0.8734639  0.2110155 -0.7102178 -0.002800874  0.000000000
 
 ```
 
 ```
 > xDF_out$stat$p
           [,1]      [,2]      [,3]      [,4]      [,5]
-[1,] 0.0000000 0.5510402 0.1258908 0.8814033 0.9006238
-[2,] 0.5510402 0.0000000 0.2127372 0.8209382 0.9982511
-[3,] 0.1258908 0.2127372 0.0000000 0.5437914 0.8613718
-[4,] 0.8814033 0.8209382 0.5437914 0.0000000 0.7843361
-[5,] 0.9006238 0.9982511 0.8613718 0.7843361 0.0000000
+[1,] 0.0000000 0.6334915 0.2334686 0.9194430 0.3824103
+[2,] 0.6334915 0.0000000 0.1397547 0.9094618 0.8328752
+[3,] 0.2334686 0.1397547 0.0000000 0.1151061 0.4775691
+[4,] 0.9194430 0.9094618 0.1151061 0.0000000 0.9977652
+[5,] 0.3824103 0.8328752 0.4775691 0.9977652 0.0000000
 ```
 
 The estimated and theoretical variances should match exactly due to independence. Note that the diagonal for both p-values and z-scores are set to zero. 
@@ -79,22 +84,22 @@ xDF also generates the theoritical variance and estimated variance for each pair
 ```
 > xDF_out$stat$TV
              [,1]         [,2]         [,3]         [,4]         [,5]
-[1,] 0.0010000000 0.0009992894 0.0009953279 0.0009999555 0.0009999688
-[2,] 0.0009992894 0.0010000000 0.0009969002 0.0009998975 0.0010000000
-[3,] 0.0009953279 0.0009969002 0.0010000000 0.0009992632 0.0009999390
-[4,] 0.0009999555 0.0009998975 0.0009992632 0.0010000000 0.0009998502
-[5,] 0.0009999688 0.0010000000 0.0009999390 0.0009998502 0.0010000000
+[1,] 0.0010000000 0.0009995454 0.0009971655 0.0009999795 0.0009984755
+[2,] 0.0009995454 0.0010000000 0.0009956498 0.0009999741 0.0009999109
+[3,] 0.0009971655 0.0009956498 0.0010000000 0.0009950490 0.0009989819
+[4,] 0.0009999795 0.0009999741 0.0009950490 0.0010000000 0.0010000000
+[5,] 0.0009984755 0.0009999109 0.0009989819 0.0010000000 0.0010000000
 ```
 and for the estimated variance, you can print out `xDF_out$var_hat_rho`,
 
 ```
 > xDF_out$var_hat_rho
              [,1]         [,2]         [,3]         [,4]         [,5]
-[1,] 0.0000000000 0.0009992894 0.0009953279 0.0009999555 0.0009999688
-[2,] 0.0009992894 0.0000000000 0.0009969002 0.0009998975 0.0010000000
-[3,] 0.0009953279 0.0009969002 0.0000000000 0.0009992632 0.0009999390
-[4,] 0.0009999555 0.0009998975 0.0009992632 0.0000000000 0.0009998502
-[5,] 0.0009999688 0.0010000000 0.0009999390 0.0009998502 0.0000000000
+[1,] 0.0000000000 0.0009995454 0.0009971655 0.0009999795 0.0009984755
+[2,] 0.0009995454 0.0000000000 0.0009956498 0.0009999741 0.0009999109
+[3,] 0.0009971655 0.0009956498 0.0000000000 0.0009950490 0.0010087944
+[4,] 0.0009999795 0.0009999741 0.0009950490 0.0000000000 0.0010000000
+[5,] 0.0009984755 0.0009999109 0.0010087944 0.0010000000 0.0000000000
 ```
 
 Note that in this case the theoritical variance and the variance estimated by xDF are identical. That is because each time series is white and there is no correlation between time series.
@@ -309,9 +314,9 @@ print(bench_single_timeseries)
 
 
 Unit: microseconds
-              expr     min       lq     mean   median       uq      max neval
-           acf_fft 127.428 134.6440 151.9977 139.9945 150.4905  648.866   100
- acf_native_single 494.255 510.1425 539.7215 519.7365 527.1575 1975.011   100
+              expr     min       lq     mean  median       uq     max neval
+           acf_fft 119.187 134.9515 148.8509 141.737 152.1100 406.433   100
+ acf_native_single 471.295 501.0815 520.9714 512.049 521.8275 994.742   100
 ```
 
 Evaluate the run time for multiple time series:
@@ -338,10 +343,9 @@ Check the run time for single timeseries using R stat's `acf()` and `RxDF()`:
 
 ```
 Unit: milliseconds
-                expr      min       lq     mean   median       uq       max neval
-             acf_fft 18.90551 23.45508 38.96694 27.04024 34.36702  99.91183   100
- acf_native_multiple 77.90312 82.08774 85.80311 83.94570 85.98588 148.86739   100
-
+                expr      min       lq     mean   median       uq      max neval
+             acf_fft 18.35447 23.89995 34.25953 27.03169 32.56761 103.1304   100
+ acf_native_multiple 78.04174 82.92463 91.41345 85.03917 88.40299 181.8708   100
 ```
 
 
