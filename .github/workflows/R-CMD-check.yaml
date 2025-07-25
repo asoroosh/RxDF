@@ -39,16 +39,13 @@ jobs:
             any::devtools
             any::remotes
             any::testthat
-            any::waldo  # explicitly ensure waldo is available
+            any::waldo
           needs: check
 
-      - name: Print session info (for debugging)
-        run: Rscript -e 'sessionInfo()'
-
-      - name: Run tests manually via testthat (summary output)
+      - name: Run unit tests via testthat
         run: |
           Rscript -e 'devtools::install()'
-          Rscript -e 'testthat::test_dir("tests/testthat", reporter = testthat::SummaryReporter$new())'
+          Rscript -e 'testthat::test_dir("tests/testthat", reporter = "summary")'
 
       - name: R CMD check
         uses: r-lib/actions/check-r-package@v2
