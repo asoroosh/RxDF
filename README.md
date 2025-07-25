@@ -1,4 +1,4 @@
-![R-CMD-check](https://github.com/asoroosh/RxDF/actions/workflows/R-CMD-check.yaml/badge.svg)
+![R-CMD-check](https://github.com/asoroosh/RxDF/actions/workflows/R-CMD-check.yaml/badge.svg) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2550181.svg)](https://doi.org/10.5281/zenodo.2550181)
 
 # RxDF
 
