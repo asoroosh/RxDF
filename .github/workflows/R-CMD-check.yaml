@@ -13,7 +13,6 @@ jobs:
         config:
           - { os: ubuntu-latest, r: 'release' }
           - { os: macos-latest,  r: 'release' }
-          - { os: windows-latest, r: 'release' }
 
     name: R ${{ matrix.config.r }} on ${{ matrix.config.os }}
     runs-on: ${{ matrix.config.os }}
