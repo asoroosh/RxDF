@@ -600,6 +600,7 @@ tukey_taper_me <- function(acs, Tt, M = sqrt(Tt)) {
 #' @details
 #' This function implements the "curb taper" described by Anderson (1984) by simply truncating
 #' autocorrelation sequences at lag `M`. No gradual tapering is applied.
+#' @export
 curb_taper_me <- function(acs, Tt, M) {
   acs <- check_dim(acs,Tt)
 
@@ -688,6 +689,7 @@ find_break_point <- function(acs, Tt) {
 #'
 #' @seealso \code{\link{find_break_point}}, \code{\link{curb_taper_me}}
 #'
+#' @export
 shrink_me <- function(acs, Tt) {
   acs <- check_dim(acs,Tt)
   where2stop <- find_break_point(acs, Tt)
