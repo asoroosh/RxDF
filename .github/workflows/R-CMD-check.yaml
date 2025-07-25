@@ -40,18 +40,14 @@ jobs:
             any::remotes
             any::testthat
             any::waldo
-          needs: check
-
-      - name: Run unit tests via testthat
-        run: |
-          Rscript -e 'devtools::install()'
-          Rscript -e 'testthat::test_dir("tests/testthat", reporter = "summary")'
 
       - name: R CMD check
         uses: r-lib/actions/check-r-package@v2
         with:
-          error-on: "error"
-          args: "--no-manual"
+          error-on: error
+          args: --no-manual
+          build-args: --no-manual
+          check-dir: check
 
       - name: Upload check results on failure
         if: failure()
