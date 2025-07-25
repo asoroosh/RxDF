@@ -34,13 +34,21 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, any::devtools, any::remotes, any::testthat
+          extra-packages: |
+            any::rcmdcheck
+            any::devtools
+            any::remotes
+            any::testthat
+            any::waldo  # explicitly ensure waldo is available
           needs: check
 
-      - name: Run unit tests via testthat
+      - name: Print session info (for debugging)
+        run: Rscript -e 'sessionInfo()'
+
+      - name: Run tests manually via testthat (summary output)
         run: |
           Rscript -e 'devtools::install()'
-          Rscript -e 'testthat::test_dir("tests/testthat", reporter = "summary")'
+          Rscript -e 'testthat::test_dir("tests/testthat", reporter = testthat::SummaryReporter$new())'
 
       - name: R CMD check
         uses: r-lib/actions/check-r-package@v2
