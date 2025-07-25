@@ -46,7 +46,7 @@ jobs:
         with:
           error-on: error
           args: --no-manual
-          build-args: --no-manual
+          build_args: --no-manual
           check-dir: check
 
       - name: Upload check results on failure
