@@ -1,3 +1,5 @@
+![R-CMD-check](https://github.com/sorooshafyouni/RxDF/actions/workflows/R-CMD-check.yaml/badge.svg)
+
 # RxDF
 
 # Effective Degrees of Freedom of the Pearson's Correlation Coefficient under Serial Correlation
