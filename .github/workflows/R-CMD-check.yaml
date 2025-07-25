@@ -13,6 +13,8 @@ jobs:
         config:
           - { os: ubuntu-latest, r: 'release' }
           - { os: macos-latest, r: 'release' }
+          # Optional: Add Windows for broader testing if desired
+          # - { os: windows-latest, r: 'release' }
 
     name: R ${{ matrix.config.r }} on ${{ matrix.config.os }}
     runs-on: ${{ matrix.config.os }}
@@ -43,44 +45,22 @@ jobs:
 
       - name: Run unit tests via testthat
         run: |
+          # Install your package first so its functions are available for tests
+          # This assumes your package name can be installed from the current directory.
           Rscript -e 'devtools::install()'
+          # Run tests from the 'tests/testthat' directory
           Rscript -e 'testthat::test_dir("tests/testthat", reporter = "summary")'
 
       - name: R CMD check
         uses: r-lib/actions/check-r-package@v2
         with:
+          # Fail on R CMD check errors
           error-on: error
+          # Arguments for R CMD check (e.g., --no-manual to skip building the manual)
           args: --no-manual
-          build_args: --no-manual # This was correctly fixed!
-          # Removed: check-dir: check # <-- This line is removed!
-          # The action will use a temporary directory by default.
-          # We can access its path for uploading later if needed.
-
-      - name: Upload check results on failure
-        if: failure()
-        # This step will now need to adapt to the default behavior of check-r-package.
-        # The check-r-package action makes the path available via an output.
-        # However, for simplicity and common usage, it's often better to let the action
-        # upload its results directly, or just rely on the default temporary directory
-        # and not try to explicitly upload "check" if the action itself is meant to.
-
-        # Let's try the simple approach first:
-        # The check-r-package action has an output for the check directory.
-        # We need to give it an ID to reference its outputs.
-        # Let's call it 'check_step'.
-
-        # Option A: Let r-lib/actions/check-r-package handle uploads (simpler)
-        # Add upload-results: true to the R CMD check step
-        # (This is often the intended way when using this action)
-        # Or, if you specifically want to upload to a custom artifact name:
-        # upload-results: true
-        # artifact-name: R-CMD-check-results
-
-        # Option B: Keep your manual upload-artifact step, but get the path from the action's output
-        # (This is more complex but gives you full control over artifact naming/behavior)
-        id: check_step # Give the check step an ID to reference its outputs
-        # Then, for the upload step:
-        uses: actions/upload-artifact@v4
-        with:
-          name: R-CMD-check-results
-          path: ${{ steps.check_step.outputs.check-dir }} # Get the path from the action's output
+          # Arguments for R CMD build (e.g., --no-manual if you specifically want it for build too)
+          build_args: --no-manual # Corrected to use underscore
+          # Have the action upload the check results as an artifact
+          upload-results: true
+          # Customize the name of the uploaded artifact
+          artifact-name: R-CMD-check-results-${{ matrix.config.os }}-${{ matrix.config.r }}
